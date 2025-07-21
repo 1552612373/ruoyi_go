@@ -138,3 +138,164 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 		},
 	})
 }
+
+func (h *SysUserHandler) GetRouters(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":  "操作成功",
+		"code": 200,
+		"data": []map[string]interface{}{
+			{
+				"name":       "System",
+				"path":       "/system",
+				"hidden":     false,
+				"redirect":   "noRedirect",
+				"component":  "Layout",
+				"alwaysShow": true,
+				"meta": map[string]interface{}{
+					"title":   "系统管理",
+					"icon":    "system",
+					"noCache": false,
+					"link":    nil,
+				},
+				"children": []map[string]interface{}{
+					{
+						"name":      "User",
+						"path":      "user",
+						"hidden":    false,
+						"component": "system/user/index",
+						"meta": map[string]interface{}{
+							"title":   "用户管理",
+							"icon":    "user",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Role",
+						"path":      "role",
+						"hidden":    false,
+						"component": "system/role/index",
+						"meta": map[string]interface{}{
+							"title":   "角色管理",
+							"icon":    "peoples",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Menu",
+						"path":      "menu",
+						"hidden":    false,
+						"component": "system/menu/index",
+						"meta": map[string]interface{}{
+							"title":   "菜单管理",
+							"icon":    "tree-table",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Dept",
+						"path":      "dept",
+						"hidden":    false,
+						"component": "system/dept/index",
+						"meta": map[string]interface{}{
+							"title":   "部门管理",
+							"icon":    "tree",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Post",
+						"path":      "post",
+						"hidden":    false,
+						"component": "system/post/index",
+						"meta": map[string]interface{}{
+							"title":   "岗位管理",
+							"icon":    "post",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Dict",
+						"path":      "dict",
+						"hidden":    false,
+						"component": "system/dict/index",
+						"meta": map[string]interface{}{
+							"title":   "字典管理",
+							"icon":    "dict",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Config",
+						"path":      "config",
+						"hidden":    false,
+						"component": "system/config/index",
+						"meta": map[string]interface{}{
+							"title":   "参数设置",
+							"icon":    "edit",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":      "Notice",
+						"path":      "notice",
+						"hidden":    false,
+						"component": "system/notice/index",
+						"meta": map[string]interface{}{
+							"title":   "通知公告",
+							"icon":    "message",
+							"noCache": false,
+							"link":    nil,
+						},
+					},
+					{
+						"name":       "Log",
+						"path":       "log",
+						"hidden":     false,
+						"redirect":   "noRedirect",
+						"component":  "ParentView",
+						"alwaysShow": true,
+						"meta": map[string]interface{}{
+							"title":   "日志管理",
+							"icon":    "log",
+							"noCache": false,
+							"link":    nil,
+						},
+						"children": []map[string]interface{}{
+							{
+								"name":      "Operlog",
+								"path":      "operlog",
+								"hidden":    false,
+								"component": "monitor/operlog/index",
+								"meta": map[string]interface{}{
+									"title":   "操作日志",
+									"icon":    "form",
+									"noCache": false,
+									"link":    nil,
+								},
+							},
+							{
+								"name":      "Logininfor",
+								"path":      "logininfor",
+								"hidden":    false,
+								"component": "monitor/logininfor/index",
+								"meta": map[string]interface{}{
+									"title":   "登录日志",
+									"icon":    "logininfor",
+									"noCache": false,
+									"link":    nil,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+}
