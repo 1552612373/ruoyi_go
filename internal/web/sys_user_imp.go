@@ -1,7 +1,13 @@
 package web
 
 import (
+	utility "go_ruoyi_base/Utility"
+	rescode "go_ruoyi_base/resCode"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func (h *SysUserHandler) Signup(ctx *gin.Context) {
@@ -39,35 +45,53 @@ func (h *SysUserHandler) Signup(ctx *gin.Context) {
 }
 
 func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
-	// var req LoginReq
+	type LoginReq struct {
+		UserName string `json:"userName" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
 
-	// if err := ctx.ShouldBindJSON(&req); err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"code": rescode.ErrInvalidParam,
-	// 		"msg":  rescode.ErrInvalidParam.String(),
-	// 	})
-	// 	return
-	// }
+	var req LoginReq
 
-	// ad, err := h.svc.Login(ctx, req.Account, req.Password)
-	// if err != nil {
-	// 	utility.ThrowSysErrowIfneeded(ctx, err)
-	// 	return
-	// }
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
 
-	// tokenStr := h.setJWTToken(ctx, ad.Id, ad.Account)
+	obj, err := h.svc.Login(ctx, req.UserName, req.Password)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-	// fmt.Println(ad)
+	tokenStr := h.setJWTToken(ctx, obj.UserId, obj.UserName)
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code": rescode.Success,
-	// 	"msg":  rescode.Success.String(),
-	// 	"data": map[string]interface{}{
-	// 		"id":         ad.Id,
-	// 		"token":      tokenStr,
-	// 		"account":    ad.Account,
-	// 		"adminLevel": ad.AdminLevel,
-	// 		"type":       ad.Type,
-	// 	},
-	// })
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": map[string]interface{}{
+			"token": tokenStr,
+		},
+	})
+}
+
+func (h *SysUserHandler) setJWTToken(ctx *gin.Context, userId int64, userName string) string {
+	ac := utility.UserClaims{
+		UserId:    userId,
+		UserName:  userName,
+		UserAgent: ctx.GetHeader("User-Agent"),
+		RegisteredClaims: jwt.RegisteredClaims{
+			// x 分钟过期
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30000)),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, ac)
+	tokenStr, err := token.SignedString(utility.JWTKey)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+	}
+	ctx.Header("tlh-jwt-token", tokenStr)
+	return tokenStr
 }

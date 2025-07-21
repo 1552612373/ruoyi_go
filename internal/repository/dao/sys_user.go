@@ -93,3 +93,9 @@ func (dao *SysUserDAO) Insert(ctx context.Context, obj SysUser) error {
 	}
 	return err
 }
+
+func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUser, error) {
+	sysUser := SysUser{}
+	err := dao.db.WithContext(ctx).Where("user_name = ?", account).First(&sysUser).Error
+	return sysUser, err
+}
