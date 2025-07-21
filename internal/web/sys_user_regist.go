@@ -20,5 +20,6 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 	group := server.Group("/api/user")
 	group.POST("/signup", h.Signup)
 	group.POST("/login", h.LoginJWT)
+	group.POST("/getInfo", h.GetInfo)
 
 }

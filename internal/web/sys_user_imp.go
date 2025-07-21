@@ -71,9 +71,10 @@ func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": map[string]interface{}{
-			"token": tokenStr,
-		},
+		// "data": map[string]interface{}{
+		// 	"token": tokenStr,
+		// },
+		"token": tokenStr,
 	})
 }
 
@@ -94,4 +95,46 @@ func (h *SysUserHandler) setJWTToken(ctx *gin.Context, userId int64, userName st
 	}
 	ctx.Header("tlh-jwt-token", tokenStr)
 	return tokenStr
+}
+
+func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
+	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrUserUnauthorized,
+			"msg":  rescode.ErrUserUnauthorized.String(),
+		})
+	}
+
+	obj, err := h.svc.GetInfo(ctx, claimsObj.UserId)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"user": map[string]interface{}{
+			"userId":        obj.UserId,
+			"deptId":        obj.DeptId,
+			"userName":      obj.UserName,
+			"nickName":      obj.NickName,
+			"email":         obj.Email,
+			"avatar":        obj.Avatar,
+			"phonenumber":   obj.Phonenumber,
+			"sex":           obj.Sex,
+			"password":      obj.Password,
+			"status":        obj.Status,
+			"delFlag":       obj.DelFlag,
+			"loginIp":       obj.LoginIp,
+			"loginDate":     obj.LoginDate,
+			"pwdUpdateDate": obj.PwdUpdateDate,
+			"createBy":      obj.CreateBy,
+			"createTime":    obj.CreateTime,
+			"updateBy":      obj.UpdateBy,
+			"updateTime":    obj.UpdateTime,
+			"remark":        obj.Remark,
+		},
+	})
 }

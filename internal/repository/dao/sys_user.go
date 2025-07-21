@@ -99,3 +99,9 @@ func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUs
 	err := dao.db.WithContext(ctx).Where("user_name = ?", account).First(&sysUser).Error
 	return sysUser, err
 }
+
+func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, error) {
+	sysUser := SysUser{}
+	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
+	return sysUser, err
+}

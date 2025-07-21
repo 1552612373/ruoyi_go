@@ -26,6 +26,12 @@ func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string
 	return domainSysUser, err
 }
 
+func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.SysUser, error) {
+	daoSysUser, err := repo.dao.FindById(ctx, id)
+	domainSysUser := repo.toDomain(daoSysUser)
+	return domainSysUser, err
+}
+
 func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	return dao.SysUser{
 		UserId:        obj.UserId,

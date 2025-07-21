@@ -37,3 +37,11 @@ func (svc *SysUserService) Login(ctx context.Context, account string, password s
 	}
 	return domainSysUser, err
 }
+
+func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUser, error) {
+	ad, err := svc.repo.FindById(ctx, id)
+	if err != nil {
+		return domain.SysUser{}, errors.New("ZT查询失败")
+	}
+	return ad, nil
+}
