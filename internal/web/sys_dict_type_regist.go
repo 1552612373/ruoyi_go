@@ -30,5 +30,7 @@ func (h *SysDictTypeHandler) RegistRoutes(server *gin.Engine) {
 		group.GET("/system/dict/type/:id", h.QueryTypeDetail)
 		// 更新字典类型
 		group.PUT("/system/dict/type", h.UpdateType)
+		// 删除字典类型
+		group.DELETE("/system/dict/type/:id", h.DeleteType)
 	}
 }

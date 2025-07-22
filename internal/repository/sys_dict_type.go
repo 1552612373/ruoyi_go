@@ -34,6 +34,11 @@ func (repo *SysDictTypeRepository) Update(ctx context.Context, obj domain.SysDic
 	return repo.dao.Update(ctx, repo.toDao(obj))
 }
 
+func (repo *SysDictTypeRepository) DeleteByDictId(ctx context.Context, dictId int64) error {
+	err := repo.dao.DeleteByDictId(ctx, dictId)
+	return err
+}
+
 func (repo *SysDictTypeRepository) toDao(obj domain.SysDictType) dao.SysDictType {
 	return dao.SysDictType{
 		DictId:     obj.DictId,

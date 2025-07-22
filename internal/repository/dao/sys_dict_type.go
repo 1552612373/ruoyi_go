@@ -96,3 +96,8 @@ func (dao *SysDictTypeDAO) Update(ctx context.Context, obj SysDictType) error {
 	err := dao.db.WithContext(ctx).Model(&obj).Where("dict_id = ?", obj.DictId).Updates(obj).Error
 	return err
 }
+
+func (dao *SysDictTypeDAO) DeleteByDictId(ctx context.Context, dictId int64) error {
+	err := dao.db.WithContext(ctx).Where("dict_id = ?", dictId).Delete(&SysDictType{}).Error
+	return err
+}

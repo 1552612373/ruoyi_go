@@ -28,6 +28,10 @@ func (svc *SysDictTypeService) QueryList(ctx context.Context, pageNum int, pageS
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
 }
 
+func (svc *SysDictTypeService) DeleteByDictId(ctx context.Context, dictId int64) error {
+	return svc.repo.DeleteByDictId(ctx, dictId)
+}
+
 func (svc *SysDictTypeService) Update(ctx context.Context, obj domain.SysDictType) error {
 	return svc.repo.Update(ctx, obj)
 }
