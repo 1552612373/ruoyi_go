@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type resObj struct {
+type resDictTypeObj struct {
 	DictId     int64  `json:"dictId"`
 	DictName   string `json:"dictName"`
 	DictType   string `json:"dictType"`
@@ -23,8 +23,8 @@ type resObj struct {
 	Remark     string `json:"remark"`
 }
 
-func toResObj(domainObj domain.SysDictType) resObj {
-	return resObj{
+func toResDictTypeObj(domainObj domain.SysDictType) resDictTypeObj {
+	return resDictTypeObj{
 		DictId:     domainObj.DictId,
 		DictName:   domainObj.DictName,
 		DictType:   domainObj.DictType,
@@ -112,7 +112,7 @@ func (h *SysDictTypeHandler) QueryTypeDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": toResObj(domainObj),
+		"data": toResDictTypeObj(domainObj),
 	})
 }
 
@@ -139,9 +139,9 @@ func (h *SysDictTypeHandler) QueryTypeList(ctx *gin.Context) {
 		return
 	}
 
-	var resList []resObj
+	var resList []resDictTypeObj
 	for _, domainObj := range domainList {
-		resList = append(resList, toResObj(domainObj))
+		resList = append(resList, toResDictTypeObj(domainObj))
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{

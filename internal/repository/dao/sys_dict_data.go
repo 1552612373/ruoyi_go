@@ -65,3 +65,26 @@ func (dao *SysDictDataDAO) Insert(ctx context.Context, obj SysDictData) error {
 	}
 	return err
 }
+
+func (dao *SysDictDataDAO) QueryList(ctx context.Context, pageNum int, pageSize int, dictType string) ([]SysDictData, int, error) {
+	objList := []SysDictData{}
+	db := dao.db.WithContext(ctx).Model(&SysDictData{})
+
+	var total int64
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Where("dict_type = ?", dictType).Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}

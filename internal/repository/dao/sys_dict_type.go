@@ -71,7 +71,7 @@ func (dao *SysDictTypeDAO) QueryByDictId(ctx context.Context, dictId int64) (Sys
 
 func (dao *SysDictTypeDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysDictType, int, error) {
 	objList := []SysDictType{}
-	db := dao.db.WithContext(ctx).Find(&objList)
+	db := dao.db.WithContext(ctx).Model(&SysDictType{})
 
 	var total int64
 

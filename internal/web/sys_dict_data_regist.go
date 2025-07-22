@@ -20,9 +20,9 @@ func NewSysDictDataHandler(svc *service.SysDictDataService) *SysDictDataHandler 
 func (h *SysDictDataHandler) RegistRoutes(server *gin.Engine) {
 	group := server.Group(utility.BASE_API_PRE)
 	{
-		// 新增字典类型
+		// 新增字典数据
 		group.POST("/system/dict/data", h.AddDictData)
-		// 查询字典列表
-		// group.GET("/system/dict/type/list", h.QueryTypeList)
+		// 查询字典数据列表
+		group.GET("/system/dict/data/list", h.QueryDictDataList)
 	}
 }

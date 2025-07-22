@@ -19,3 +19,7 @@ func NewSysDictDataService(repo *repository.SysDictDataRepository) *SysDictDataS
 func (svc *SysDictDataService) Create(ctx context.Context, obj domain.SysDictData) error {
 	return svc.repo.Create(ctx, obj)
 }
+
+func (svc *SysDictDataService) QueryList(ctx context.Context, pageNum int, pageSize int, dictType string) ([]domain.SysDictData, int, error) {
+	return svc.repo.QueryList(ctx, pageNum, pageSize, dictType)
+}
