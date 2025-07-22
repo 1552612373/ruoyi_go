@@ -11,7 +11,7 @@ import (
 // SysDictData 字典数据表(sys_dict_data)
 type SysDictData struct {
 	// 字典数据ID（主键）
-	DictCode int64 `json:"dictCode" gorm:"column:dict_code;primaryKey"`
+	DictCode int64 `json:"dictCode" gorm:"column:dict_code;primaryKey;autoIncrement"`
 
 	// 字典排序
 	DictSort int `json:"dictSort" gorm:"column:dict_sort"`

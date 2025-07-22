@@ -5,7 +5,7 @@ import "time"
 // SysDept 部门信息表(sys_dept)
 type SysDept struct {
 	// 部门ID（主键）
-	DeptId int64 `json:"deptId" gorm:"column:dept_id;primaryKey"`
+	DeptId int64 `json:"deptId" gorm:"column:dept_id;primaryKey;autoIncrement"`
 
 	// 父部门ID（顶级部门为0）
 	ParentId int64 `json:"parentId" gorm:"column:parent_id"`

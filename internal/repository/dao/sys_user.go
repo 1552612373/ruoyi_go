@@ -12,7 +12,7 @@ import (
 // SysUser 用户信息表(sys_user)
 type SysUser struct {
 	// 用户ID（主键）
-	UserId int64 `json:"userId" gorm:"column:user_id;primaryKey"`
+	UserId int64 `json:"userId" gorm:"column:user_id;primaryKey;autoIncrement"`
 
 	// 所属部门ID
 	DeptId int64 `json:"deptId" gorm:"column:dept_id"`

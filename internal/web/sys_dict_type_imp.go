@@ -5,10 +5,37 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+type resObj struct {
+	DictId     int64  `json:"dictId"`
+	DictName   string `json:"dictName"`
+	DictType   string `json:"dictType"`
+	Status     string `json:"status"`
+	CreateBy   string `json:"createBy"`
+	CreateTime string `json:"createTime"`
+	UpdateBy   string `json:"updateBy"`
+	UpdateTime string `json:"updateTime"`
+	Remark     string `json:"remark"`
+}
+
+func toResObj(domainObj domain.SysDictType) resObj {
+	return resObj{
+		DictId:     domainObj.DictId,
+		DictName:   domainObj.DictName,
+		DictType:   domainObj.DictType,
+		Status:     domainObj.Status,
+		Remark:     domainObj.Remark,
+		UpdateBy:   domainObj.UpdateBy,
+		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		CreateBy:   domainObj.CreateBy,
+		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+	}
+}
 
 // 新增字典类型
 func (h *SysDictTypeHandler) AddDictType(ctx *gin.Context) {
@@ -70,21 +97,23 @@ func (h *SysDictTypeHandler) AddDictType(ctx *gin.Context) {
 // 查询字典详情
 func (h *SysDictTypeHandler) QueryTypeDetail(ctx *gin.Context) {
 	// 获取路径参数 id
-	// idStr := ctx.Param("id")
-	// id, err := strconv.ParseInt(idStr, 10, 64)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"code": rescode.ErrInvalidParam,
-	// 		"msg":  "无效的字典类型ID",
-	// 	})
-	// 	return
-	// }
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code": 200,
-	// 	"msg":  "success",
-	// 	"data": dictType,
-	// })
+	domainObj, err := h.svc.QueryByDictId(ctx, id)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": toResObj(domainObj),
+	})
 }
 
 // 查询字典列表
@@ -110,29 +139,9 @@ func (h *SysDictTypeHandler) QueryTypeList(ctx *gin.Context) {
 		return
 	}
 
-	type newListObj struct {
-		DictId     int64  `json:"dictId"`
-		DictName   string `json:"dictName"`
-		DictType   string `json:"dictType"`
-		Status     string `json:"status"`
-		CreateBy   string `json:"createBy"`
-		CreateTime string `json:"createTime"`
-		UpdateBy   string `json:"updateBy"`
-		UpdateTime string `json:"updateTime"`
-		Remark     string `json:"remark"`
-	}
-	var resList []newListObj
+	var resList []resObj
 	for _, domainObj := range domainList {
-		resList = append(resList, newListObj{
-			DictName:   domainObj.DictName,
-			DictType:   domainObj.DictType,
-			Status:     domainObj.Status,
-			Remark:     domainObj.Remark,
-			UpdateBy:   domainObj.UpdateBy,
-			UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
-			CreateBy:   domainObj.CreateBy,
-			CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
-		})
+		resList = append(resList, toResObj(domainObj))
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{

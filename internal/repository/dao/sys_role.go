@@ -5,7 +5,7 @@ import "time"
 // SysRole 角色信息表(sys_role)
 type SysRole struct {
 	// 角色ID（主键）
-	RoleId int64 `json:"roleId" gorm:"column:role_id;primaryKey"`
+	RoleId int64 `json:"roleId" gorm:"column:role_id;primaryKey;autoIncrement"`
 
 	// 角色名称（如：管理员、普通用户）
 	RoleName string `json:"roleName" gorm:"column:role_name"`

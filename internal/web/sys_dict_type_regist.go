@@ -25,6 +25,6 @@ func (h *SysDictTypeHandler) RegistRoutes(server *gin.Engine) {
 		// 查询字典列表
 		group.GET("/system/dict/type/list", h.QueryTypeList)
 		// 查询字典详情
-		group.GET("/system/dict/type:id", h.QueryTypeDetail)
+		group.GET("/system/dict/type/:id", h.QueryTypeDetail)
 	}
 }

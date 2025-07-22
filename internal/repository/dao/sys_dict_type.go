@@ -11,7 +11,7 @@ import (
 // SysDictType 字典类型表(sys_dict_type)
 type SysDictType struct {
 	// 字典类型ID（主键）
-	DictId int64 `json:"dictId" gorm:"column:dict_id;primaryKey"`
+	DictId int64 `json:"dictId" gorm:"column:dict_id;primaryKey;autoIncrement"`
 
 	// 字典名称（如：用户性别）
 	DictName string `json:"dictName" gorm:"column:dict_name"`
@@ -61,6 +61,12 @@ func (dao *SysDictTypeDAO) Insert(ctx context.Context, obj SysDictType) error {
 		}
 	}
 	return err
+}
+
+func (dao *SysDictTypeDAO) QueryByDictId(ctx context.Context, dictId int64) (SysDictType, error) {
+	obj := SysDictType{}
+	err := dao.db.WithContext(ctx).Where("dict_id = ?", dictId).First(&obj)
+	return obj, err.Error
 }
 
 func (dao *SysDictTypeDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysDictType, int, error) {
