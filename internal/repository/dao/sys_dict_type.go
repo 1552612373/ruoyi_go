@@ -94,6 +94,13 @@ func (dao *SysDictTypeDAO) QueryList(ctx context.Context, pageNum int, pageSize 
 
 func (dao *SysDictTypeDAO) Update(ctx context.Context, obj SysDictType) error {
 	err := dao.db.WithContext(ctx).Model(&obj).Where("dict_id = ?", obj.DictId).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
 	return err
 }
 

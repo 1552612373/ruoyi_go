@@ -33,4 +33,7 @@ type SysDictData struct {
 
 	// 备注
 	Remark string `json:"remark" gorm:"column:remark"`
+
+	ListClass string `json:"listClass" gorm:"column:list_class"`
+	CssClass  string `json:"cssClass" gorm:"column:css_class"`
 }
