@@ -20,6 +20,11 @@ func (repo *SysDictTypeRepository) Create(ctx context.Context, obj domain.SysDic
 	return repo.dao.Insert(ctx, repo.toDao(obj))
 }
 
+func (repo *SysDictTypeRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysDictType, int, error) {
+	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
+	return repo.toDomainList(daoList), total, err
+}
+
 func (repo *SysDictTypeRepository) toDao(obj domain.SysDictType) dao.SysDictType {
 	return dao.SysDictType{
 		DictId:     obj.DictId,
@@ -32,4 +37,27 @@ func (repo *SysDictTypeRepository) toDao(obj domain.SysDictType) dao.SysDictType
 		UpdateTime: obj.UpdateTime,
 		Remark:     obj.Remark,
 	}
+}
+
+func (repo *SysDictTypeRepository) toDomain(obj dao.SysDictType) domain.SysDictType {
+	return domain.SysDictType{
+		DictId:     obj.DictId,
+		DictName:   obj.DictName,
+		DictType:   obj.DictType,
+		Status:     obj.Status,
+		CreateBy:   obj.CreateBy,
+		CreateTime: obj.CreateTime,
+		UpdateBy:   obj.UpdateBy,
+		UpdateTime: obj.UpdateTime,
+		Remark:     obj.Remark,
+	}
+}
+
+func (repo *SysDictTypeRepository) toDomainList(daoList []dao.SysDictType) []domain.SysDictType {
+	domainList := []domain.SysDictType{}
+	for _, daoObj := range daoList {
+		domainObj := repo.toDomain(daoObj)
+		domainList = append(domainList, domainObj)
+	}
+	return domainList
 }

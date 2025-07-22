@@ -3,7 +3,7 @@ package rescode
 type Code int
 
 const (
-	Success Code = 0
+	Success Code = 200
 
 	// 通用错误码 1xxx
 	ErrUnknown        Code = 1000
