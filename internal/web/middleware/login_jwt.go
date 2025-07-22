@@ -15,7 +15,7 @@ type LoginJWTMiddlewareBuilder struct {
 func (m *LoginJWTMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		path := ctx.Request.URL.Path
-		if path == "/api/user/login" || path == "/api/user/signup" || strings.HasPrefix(path, "/swagger") {
+		if strings.Contains(path, "/login") || strings.Contains(path, "/signup") || strings.HasPrefix(path, "/swagger") {
 			// 不用token
 			return
 		}

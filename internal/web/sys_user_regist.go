@@ -1,6 +1,7 @@
 package web
 
 import (
+	utility "go_ruoyi_base/Utility"
 	"go_ruoyi_base/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -17,12 +18,14 @@ func NewSysUserHandler(svc *service.SysUserService) *SysUserHandler {
 }
 
 func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
-	group := server.Group("/api/user")
-	group.POST("/signup", h.Signup)
-	group.POST("/login", h.LoginJWT)
-	group.GET("/getInfo", h.GetInfo)
+	group := server.Group(utility.BASE_API_PRE)
+	{
+		group.POST("/signup", h.Signup)
+		group.POST("/login", h.LoginJWT)
+		group.GET("/getInfo", h.GetInfo)
 
-	// 临时
-	server.GET("/api/getRouters", h.GetRouters)
+		// 临时
+		group.GET("/getRouters", h.GetRouters)
+	}
 
 }
