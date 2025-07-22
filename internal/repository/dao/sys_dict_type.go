@@ -91,3 +91,8 @@ func (dao *SysDictTypeDAO) QueryList(ctx context.Context, pageNum int, pageSize 
 
 	return objList, int(total), err
 }
+
+func (dao *SysDictTypeDAO) Update(ctx context.Context, obj SysDictType) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("dict_id = ?", obj.DictId).Updates(obj).Error
+	return err
+}

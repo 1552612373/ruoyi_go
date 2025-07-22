@@ -24,7 +24,11 @@ func (h *SysDictTypeHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/system/dict/type", h.AddDictType)
 		// 查询字典列表
 		group.GET("/system/dict/type/list", h.QueryTypeList)
+		// 查询字典下拉列表
+		group.GET("/system/dict/type/optionselect", h.QueryOptionselect)
 		// 查询字典详情
 		group.GET("/system/dict/type/:id", h.QueryTypeDetail)
+		// 更新字典类型
+		group.PUT("/system/dict/type", h.UpdateType)
 	}
 }

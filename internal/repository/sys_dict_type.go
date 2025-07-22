@@ -30,6 +30,10 @@ func (repo *SysDictTypeRepository) QueryList(ctx context.Context, pageNum int, p
 	return repo.toDomainList(daoList), total, err
 }
 
+func (repo *SysDictTypeRepository) Update(ctx context.Context, obj domain.SysDictType) error {
+	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
 func (repo *SysDictTypeRepository) toDao(obj domain.SysDictType) dao.SysDictType {
 	return dao.SysDictType{
 		DictId:     obj.DictId,

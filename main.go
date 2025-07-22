@@ -32,6 +32,9 @@ func main() {
 	sysDictTypeHandler := initSysDictType(db)
 	sysDictTypeHandler.RegistRoutes(server)
 
+	sysDictDataHandler := initSysDictData(db)
+	sysDictDataHandler.RegistRoutes(server)
+
 	for _, route := range server.Routes() {
 		log.Printf("HTTP %s --> %s\n", route.Method, route.Path)
 	}
@@ -135,5 +138,13 @@ func initSysDictType(db *gorm.DB) *web.SysDictTypeHandler {
 	myRepo := repository.NewSysDictTypeRepository(myDao)
 	mySvc := service.NewSysDictTypeService(myRepo)
 	myHandler := web.NewSysDictTypeHandler(mySvc)
+	return myHandler
+}
+
+func initSysDictData(db *gorm.DB) *web.SysDictDataHandler {
+	myDao := dao.NewSysDictDataDAO(db)
+	myRepo := repository.NewSysDictDataRepository(myDao)
+	mySvc := service.NewSysDictDataService(myRepo)
+	myHandler := web.NewSysDictDataHandler(mySvc)
 	return myHandler
 }

@@ -143,6 +143,15 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 			"updateTime":    obj.UpdateTime,
 			"remark":        obj.Remark,
 		},
+		// 临时这样写
+		"permissions": []string{
+			"*:*:*",
+		},
+		"roles": []string{
+			"admin",
+		},
+		"isDefaultModifyPwd": false,
+		"isPasswordExpired":  false,
 	})
 }
 

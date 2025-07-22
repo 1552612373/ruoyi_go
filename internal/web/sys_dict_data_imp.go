@@ -99,9 +99,9 @@ func (h *SysDictDataHandler) AddDictData(ctx *gin.Context) {
 // 查询字典数据列表
 func (h *SysDictDataHandler) QueryDictDataList(ctx *gin.Context) {
 	type typeReq struct {
-		PageNum  int    `json:"pageNum"`
-		PageSize int    `json:"pageSize"`
-		DictType string `json:"dictType" binding:"required"`
+		PageNum  int    `form:"pageNum" json:"pageNum"`   // 添加 form 标签
+		PageSize int    `form:"pageSize" json:"pageSize"` // 添加 form 标签
+		DictType string `form:"dictType" json:"dictType" binding:"required"`
 	}
 
 	var req typeReq

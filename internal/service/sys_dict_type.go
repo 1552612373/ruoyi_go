@@ -27,3 +27,7 @@ func (svc *SysDictTypeService) QueryByDictId(ctx context.Context, dictId int64) 
 func (svc *SysDictTypeService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysDictType, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
 }
+
+func (svc *SysDictTypeService) Update(ctx context.Context, obj domain.SysDictType) error {
+	return svc.repo.Update(ctx, obj)
+}
