@@ -67,6 +67,26 @@ func (h *SysDictTypeHandler) AddDictType(ctx *gin.Context) {
 
 }
 
+// 查询字典详情
+func (h *SysDictTypeHandler) QueryTypeDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	// idStr := ctx.Param("id")
+	// id, err := strconv.ParseInt(idStr, 10, 64)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{
+	// 		"code": rescode.ErrInvalidParam,
+	// 		"msg":  "无效的字典类型ID",
+	// 	})
+	// 	return
+	// }
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"code": 200,
+	// 	"msg":  "success",
+	// 	"data": dictType,
+	// })
+}
+
 // 查询字典列表
 func (h *SysDictTypeHandler) QueryTypeList(ctx *gin.Context) {
 	type typeReq struct {

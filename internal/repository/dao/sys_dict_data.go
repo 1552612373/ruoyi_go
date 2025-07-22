@@ -1,5 +1,13 @@
 package dao
 
+import (
+	"context"
+	"errors"
+
+	"github.com/go-sql-driver/mysql"
+	"gorm.io/gorm"
+)
+
 // SysDictData 字典数据表(sys_dict_data)
 type SysDictData struct {
 	// 字典数据ID（主键）
@@ -34,4 +42,26 @@ type SysDictData struct {
 
 	// 备注
 	Remark string `json:"remark" gorm:"column:remark"`
+}
+
+type SysDictDataDAO struct {
+	db *gorm.DB
+}
+
+func NewSysDictDataDAO(db *gorm.DB) *SysDictDataDAO {
+	return &SysDictDataDAO{
+		db: db,
+	}
+}
+
+func (dao *SysDictDataDAO) Insert(ctx context.Context, obj SysDictData) error {
+	err := dao.db.WithContext(ctx).Create(&obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
 }
