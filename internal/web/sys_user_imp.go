@@ -97,6 +97,13 @@ func (h *SysUserHandler) setJWTToken(ctx *gin.Context, userId int64, userName st
 	return tokenStr
 }
 
+func (h *SysUserHandler) Logout(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+}
+
 func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
 	if !ok {

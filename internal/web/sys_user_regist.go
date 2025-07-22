@@ -22,6 +22,7 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 	{
 		group.POST("/signup", h.Signup)
 		group.POST("/login", h.LoginJWT)
+		group.POST("/logout", h.Logout)
 		group.GET("/getInfo", h.GetInfo)
 
 		// 临时

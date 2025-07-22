@@ -71,12 +71,12 @@ func (h *SysDictTypeHandler) AddDictType(ctx *gin.Context) {
 func (h *SysDictTypeHandler) QueryTypeList(ctx *gin.Context) {
 	type typeReq struct {
 		PageNum  int `json:"pageNum"`
-		PageSize int `json:"pageSize" gorm:"column:dict_type;uniqueIndex;type:varchar(255)" binding:"required"`
+		PageSize int `json:"pageSize"`
 	}
 
 	var req typeReq
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"code": rescode.ErrInvalidParam,
 			"msg":  rescode.ErrInvalidParam.String(),
