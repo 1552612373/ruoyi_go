@@ -11,35 +11,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type resDictDataObj struct {
-	DictCode   int64  `json:"dictCode"`
-	DictSort   int    `json:"dictSort"`
-	DictLabel  string `json:"dictLabel"`
-	DictValue  string `json:"dictValue"`
-	DictType   string `json:"dictType"`
-	Status     string `json:"status"`
-	CreateBy   string `json:"createBy"`
-	CreateTime string `json:"createTime"`
-	UpdateBy   string `json:"updateBy"`
-	UpdateTime string `json:"updateTime"`
-	Remark     string `json:"remark"`
-}
+// type resDictDataObj struct {
+// 	DictCode   int64  `json:"dictCode"`
+// 	DictSort   int    `json:"dictSort"`
+// 	DictLabel  string `json:"dictLabel"`
+// 	DictValue  string `json:"dictValue"`
+// 	DictType   string `json:"dictType"`
+// 	Status     string `json:"status"`
+// 	CreateBy   string `json:"createBy"`
+// 	CreateTime string `json:"createTime"`
+// 	UpdateBy   string `json:"updateBy"`
+// 	UpdateTime string `json:"updateTime"`
+// 	Remark     string `json:"remark"`
+// }
 
-func toResDictDataObj(domainObj domain.SysDictData) resDictDataObj {
-	return resDictDataObj{
-		DictCode:   domainObj.DictCode,
-		DictSort:   domainObj.DictSort,
-		DictLabel:  domainObj.DictLabel,
-		DictValue:  domainObj.DictValue,
-		DictType:   domainObj.DictType,
-		Status:     domainObj.Status,
-		Remark:     domainObj.Remark,
-		UpdateBy:   domainObj.UpdateBy,
-		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
-		CreateBy:   domainObj.CreateBy,
-		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
-	}
-}
+// func toResDictDataObj(domainObj domain.SysDictData) resDictDataObj {
+// 	return resDictDataObj{
+// 		DictCode:   domainObj.DictCode,
+// 		DictSort:   domainObj.DictSort,
+// 		DictLabel:  domainObj.DictLabel,
+// 		DictValue:  domainObj.DictValue,
+// 		DictType:   domainObj.DictType,
+// 		Status:     domainObj.Status,
+// 		Remark:     domainObj.Remark,
+// 		UpdateBy:   domainObj.UpdateBy,
+// 		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+// 		CreateBy:   domainObj.CreateBy,
+// 		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+// 	}
+// }
 
 // 新增字典数据
 func (h *SysDictDataHandler) AddDictData(ctx *gin.Context) {
@@ -76,12 +76,12 @@ func (h *SysDictDataHandler) AddDictData(ctx *gin.Context) {
 	err := h.svc.Create(ctx, domain.SysDictData{
 		DictLabel:  req.DictLabel,
 		DictValue:  req.DictValue,
-		ListClass:  req.ListClass,
+		ListClass:  &req.ListClass,
 		DictSort:   req.DictSort,
 		Status:     req.Status,
 		DictType:   req.DictType,
-		CssClass:   req.CssClass,
-		Remark:     req.Remark,
+		CssClass:   &req.CssClass,
+		Remark:     &req.Remark,
 		UpdateBy:   claimsObj.UserName,
 		UpdateTime: now,
 		CreateBy:   claimsObj.UserName,
@@ -123,9 +123,10 @@ func (h *SysDictDataHandler) QueryDictDataList(ctx *gin.Context) {
 		return
 	}
 
-	var resList []resDictDataObj
+	var resList []domain.SysDictData
 	for _, domainObj := range domainList {
-		resList = append(resList, toResDictDataObj(domainObj))
+		// resList = append(resList, toResDictDataObj(domainObj))
+		resList = append(resList, domainObj)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -147,9 +148,9 @@ func (h *SysDictDataHandler) QueryDictDataType(ctx *gin.Context) {
 		return
 	}
 
-	var resList []resDictDataObj
+	var resList []domain.SysDictData
 	for _, domainObj := range domainList {
-		resList = append(resList, toResDictDataObj(domainObj))
+		resList = append(resList, domainObj)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -183,7 +184,7 @@ func (h *SysDictDataHandler) QueryDataDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": toResDictDataObj(domainObj),
+		"data": domainObj,
 	})
 }
 
@@ -259,12 +260,12 @@ func (h *SysDictDataHandler) UpdateDictData(ctx *gin.Context) {
 		DictLabel: req.DictLabel,
 		DictValue: req.DictValue,
 		DictType:  req.DictType,
-		CssClass:  req.CssClass,
-		ListClass: req.ListClass,
+		CssClass:  &req.CssClass,
+		ListClass: &req.ListClass,
 		// IsDefault:  req.IsDefault,
 		Status: req.Status,
 		// Default:    req.Default,
-		Remark:     req.Remark,
+		Remark:     &req.Remark,
 		CreateBy:   req.CreateBy,
 		CreateTime: utility.ParseToTimestamp(utility.DefaultTimeFormat, req.CreateTime),
 		UpdateBy:   claimsObj.UserName,

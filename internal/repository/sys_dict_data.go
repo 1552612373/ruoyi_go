@@ -46,14 +46,15 @@ func (repo *SysDictDataRepository) toDao(obj domain.SysDictData) dao.SysDictData
 		DictLabel:  obj.DictLabel,
 		DictValue:  obj.DictValue,
 		DictType:   obj.DictType,
+		CssClass:   obj.CssClass,
+		ListClass:  obj.ListClass,
+		IsDefault:  obj.IsDefault,
 		Status:     obj.Status,
 		CreateBy:   obj.CreateBy,
 		CreateTime: obj.CreateTime,
 		UpdateBy:   obj.UpdateBy,
 		UpdateTime: obj.UpdateTime,
 		Remark:     obj.Remark,
-		ListClass:  obj.ListClass,
-		CssClass:   obj.CssClass,
 	}
 }
 
@@ -64,14 +65,15 @@ func (repo *SysDictDataRepository) toDomain(obj dao.SysDictData) domain.SysDictD
 		DictLabel:  obj.DictLabel,
 		DictValue:  obj.DictValue,
 		DictType:   obj.DictType,
+		CssClass:   obj.CssClass,
+		ListClass:  obj.ListClass,
+		IsDefault:  obj.IsDefault,
 		Status:     obj.Status,
 		CreateBy:   obj.CreateBy,
 		CreateTime: obj.CreateTime,
 		UpdateBy:   obj.UpdateBy,
 		UpdateTime: obj.UpdateTime,
 		Remark:     obj.Remark,
-		ListClass:  obj.ListClass,
-		CssClass:   obj.CssClass,
 	}
 }
 
