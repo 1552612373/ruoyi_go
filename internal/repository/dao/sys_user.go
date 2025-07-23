@@ -9,64 +9,66 @@ import (
 	"gorm.io/gorm"
 )
 
-// SysUser 用户信息表(sys_user)
 type SysUser struct {
-	// 用户ID（主键）
-	UserId int64 `json:"userId" gorm:"column:user_id;primaryKey;autoIncrement"`
+	// 用户ID
+	UserID int64 `gorm:"column:user_id;primaryKey;autoIncrement" json:"userId"`
 
-	// 所属部门ID
-	DeptId int64 `json:"deptId" gorm:"column:dept_id"`
+	// 部门ID
+	DeptID *int64 `gorm:"column:dept_id" json:"deptId"`
 
-	// 登录账号（唯一）
-	UserName string `json:"userName" gorm:"column:user_name"`
+	// 用户账号
+	UserName string `gorm:"column:user_name" json:"userName"`
 
-	// 用户昵称（显示用）
-	NickName string `json:"nickName" gorm:"column:nick_name"`
+	// 用户昵称
+	NickName string `gorm:"column:nick_name" json:"nickName"`
 
-	// 邮箱地址
-	Email string `json:"email" gorm:"column:email"`
+	// 用户类型（00系统用户）
+	UserType string `gorm:"column:user_type" json:"userType"`
 
-	// 头像地址（URL 或 Base64）
-	Avatar string `json:"avatar" gorm:"column:avatar"`
+	// 用户邮箱
+	Email string `gorm:"column:email" json:"email"`
 
 	// 手机号码
-	Phonenumber string `json:"phonenumber" gorm:"column:phonenumber"`
+	Phonenumber string `gorm:"column:phonenumber" json:"phonenumber"`
 
-	// 性别 男、女
-	Sex string `json:"sex" gorm:"column:sex"`
+	// 用户性别（0男 1女 2未知）
+	Sex string `gorm:"column:sex" json:"sex"`
 
-	// 登录密码（加密存储）
-	Password string `json:"password" gorm:"column:password"`
+	// 头像地址
+	Avatar string `gorm:"column:avatar" json:"avatar"`
 
-	// 账户状态（0-启用，1-停用）
-	Status string `json:"status" gorm:"column:status"`
+	// 密码
+	Password string `gorm:"column:password" json:"password"`
 
-	// 删除标志（0-正常，1-已删除，2-彻底删除）
-	DelFlag string `json:"delFlag" gorm:"column:del_flag"`
+	// 账号状态（0正常 1停用）
+	Status string `gorm:"column:status" json:"status"`
+
+	// 删除标志（0代表存在 2代表删除）
+	DelFlag string `gorm:"column:del_flag" json:"delFlag"`
 
 	// 最后登录IP
-	LoginIp string `json:"loginIp" gorm:"column:login_ip"`
+	LoginIP string `gorm:"column:login_ip" json:"loginIp"`
 
-	// 最后登录时间
-	LoginDate int64 `json:"loginDate" gorm:"column:login_date"`
+	// 最后登录时间（时间戳）
+	LoginDate int64 `gorm:"column:login_date" json:"loginDate"`
 
-	// 密码最后修改时间
-	PwdUpdateDate int64 `json:"pwdUpdateDate" gorm:"column:pwd_update_date"`
+	// 密码最后更新时间（时间戳）
+	PwdUpdateDate int64 `gorm:"column:pwd_update_date" json:"pwdUpdateDate"`
 
-	// 创建人（操作者用户名）
-	CreateBy string `json:"createBy" gorm:"column:create_by"`
+	// 创建者
+	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
-	// 创建时间
-	CreateTime int64 `json:"createTime" gorm:"column:create_time"`
+	// 创建时间（时间戳）
+	CreateTime int64 `gorm:"column:create_time" json:"createTime"`
 
-	// 最后更新人
-	UpdateBy string `json:"updateBy" gorm:"column:update_by"`
+	// 更新者
+	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
-	// 最后更新时间
-	UpdateTime int64 `json:"updateTime" gorm:"column:update_time"`
+	// 更新时间（时间戳）
+	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
 
-	// 备注信息（可选）
-	Remark string `json:"remark" gorm:"column:remark"`
+	// 备注
+	Remark *string `gorm:"column:remark" json:"remark"`
 }
 
 type SysUserDAO struct {

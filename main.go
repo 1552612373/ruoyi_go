@@ -62,6 +62,7 @@ func initDB() *gorm.DB {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			// NoLowerCase: true, // 禁用字段名的小写转换
+			SingularTable: true, // 禁用复数形式，即不再自动加 s
 		},
 	})
 

@@ -66,7 +66,7 @@ func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
 		return
 	}
 
-	tokenStr := h.setJWTToken(ctx, obj.UserId, obj.UserName)
+	tokenStr := h.setJWTToken(ctx, obj.UserID, obj.UserName)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
@@ -123,18 +123,19 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
 		"user": map[string]interface{}{
-			"userId":        obj.UserId,
-			"deptId":        obj.DeptId,
+			"userId":        obj.UserID,
+			"deptId":        obj.DeptID,
 			"userName":      obj.UserName,
 			"nickName":      obj.NickName,
+			"userType":      obj.UserType,
 			"email":         obj.Email,
-			"avatar":        obj.Avatar,
 			"phonenumber":   obj.Phonenumber,
 			"sex":           obj.Sex,
+			"avatar":        obj.Avatar,
 			"password":      obj.Password,
 			"status":        obj.Status,
 			"delFlag":       obj.DelFlag,
-			"loginIp":       obj.LoginIp,
+			"loginIp":       obj.LoginIP,
 			"loginDate":     obj.LoginDate,
 			"pwdUpdateDate": obj.PwdUpdateDate,
 			"createBy":      obj.CreateBy,
