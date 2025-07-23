@@ -23,7 +23,9 @@ func (h *SysDictDataHandler) RegistRoutes(server *gin.Engine) {
 		// 新增字典数据
 		group.POST("/system/dict/data", h.AddDictData)
 		// 更新字典数据
-		// group.PUT("/system/dict/data", h.UpdateDictData)
+		group.PUT("/system/dict/data", h.UpdateDictData)
+		// 删除字典数据
+		group.DELETE("/system/dict/data/:dictCode", h.DeleteDictData)
 		// 查询字典数据列表
 		group.GET("/system/dict/data/list", h.QueryDictDataList)
 		// 查询字典数据列表

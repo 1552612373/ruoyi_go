@@ -186,3 +186,98 @@ func (h *SysDictDataHandler) QueryDataDetail(ctx *gin.Context) {
 		"data": toResDictDataObj(domainObj),
 	})
 }
+
+// 删除字典数据
+func (h *SysDictDataHandler) DeleteDictData(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("dictCode")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	errx := h.svc.DeleteByDictCode(ctx, id)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, errx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
+}
+
+// 更新字典类型
+func (h *SysDictDataHandler) UpdateDictData(ctx *gin.Context) {
+
+	type dictReq struct {
+		DictCode   int64  `json:"dictCode"`
+		DictSort   int    `json:"dictSort"`
+		DictLabel  string `json:"dictLabel"`
+		DictValue  string `json:"dictValue"`
+		DictType   string `json:"dictType"`
+		CssClass   string `json:"cssClass"`
+		ListClass  string `json:"listClass"`
+		IsDefault  string `json:"isDefault"`
+		Status     string `json:"status"`
+		Default    bool   `json:"default"`
+		CreateBy   string `json:"createBy"`
+		CreateTime string `json:"createTime"`
+		UpdateBy   string `json:"updateBy"`
+		UpdateTime string `json:"updateTime"`
+		Remark     string `json:"remark"`
+	}
+
+	var req dictReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrUserUnauthorized,
+			"msg":  rescode.ErrUserUnauthorized.String(),
+		})
+	}
+	now := time.Now().UnixMilli()
+
+	err := h.svc.Update(ctx, domain.SysDictData{
+		DictCode:  req.DictCode,
+		DictSort:  req.DictSort,
+		DictLabel: req.DictLabel,
+		DictValue: req.DictValue,
+		DictType:  req.DictType,
+		CssClass:  req.CssClass,
+		ListClass: req.ListClass,
+		// IsDefault:  req.IsDefault,
+		Status: req.Status,
+		// Default:    req.Default,
+		Remark:     req.Remark,
+		CreateBy:   req.CreateBy,
+		CreateTime: utility.ParseToTimestamp(utility.DefaultTimeFormat, req.CreateTime),
+		UpdateBy:   claimsObj.UserName,
+		UpdateTime: now,
+	})
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
+}

@@ -42,6 +42,9 @@ type SysDictData struct {
 
 	// 备注
 	Remark string `json:"remark" gorm:"column:remark"`
+
+	ListClass string `json:"listClass" gorm:"column:list_class"`
+	CssClass  string `json:"cssClass" gorm:"column:css_class"`
 }
 
 type SysDictDataDAO struct {
@@ -93,4 +96,21 @@ func (dao *SysDictDataDAO) QueryByDictCode(ctx context.Context, dictCode int64) 
 	obj := SysDictData{}
 	err := dao.db.WithContext(ctx).Where("dict_code = ?", dictCode).First(&obj)
 	return obj, err.Error
+}
+
+func (dao *SysDictDataDAO) Update(ctx context.Context, obj SysDictData) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("dict_code = ?", obj.DictCode).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}
+
+func (dao *SysDictDataDAO) DeleteByDictCode(ctx context.Context, dictCode int64) error {
+	err := dao.db.WithContext(ctx).Where("dict_code = ?", dictCode).Delete(&SysDictData{}).Error
+	return err
 }

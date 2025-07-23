@@ -25,6 +25,15 @@ func (repo *SysDictDataRepository) QueryByDictCode(ctx context.Context, dictCode
 	return repo.toDomain(daoObj), err
 }
 
+func (repo *SysDictDataRepository) Update(ctx context.Context, obj domain.SysDictData) error {
+	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
+func (repo *SysDictDataRepository) DeleteByDictCode(ctx context.Context, dictCode int64) error {
+	err := repo.dao.DeleteByDictCode(ctx, dictCode)
+	return err
+}
+
 func (repo *SysDictDataRepository) QueryList(ctx context.Context, pageNum int, pageSize int, dictType string) ([]domain.SysDictData, int, error) {
 	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize, dictType)
 	return repo.toDomainList(daoList), total, err
@@ -43,6 +52,8 @@ func (repo *SysDictDataRepository) toDao(obj domain.SysDictData) dao.SysDictData
 		UpdateBy:   obj.UpdateBy,
 		UpdateTime: obj.UpdateTime,
 		Remark:     obj.Remark,
+		ListClass:  obj.ListClass,
+		CssClass:   obj.CssClass,
 	}
 }
 
@@ -59,6 +70,8 @@ func (repo *SysDictDataRepository) toDomain(obj dao.SysDictData) domain.SysDictD
 		UpdateBy:   obj.UpdateBy,
 		UpdateTime: obj.UpdateTime,
 		Remark:     obj.Remark,
+		ListClass:  obj.ListClass,
+		CssClass:   obj.CssClass,
 	}
 }
 

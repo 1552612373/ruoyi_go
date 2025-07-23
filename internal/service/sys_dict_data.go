@@ -27,3 +27,11 @@ func (svc *SysDictDataService) QueryByDictCode(ctx context.Context, dictCode int
 func (svc *SysDictDataService) QueryList(ctx context.Context, pageNum int, pageSize int, dictType string) ([]domain.SysDictData, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize, dictType)
 }
+
+func (svc *SysDictDataService) DeleteByDictCode(ctx context.Context, dictCode int64) error {
+	return svc.repo.DeleteByDictCode(ctx, dictCode)
+}
+
+func (svc *SysDictDataService) Update(ctx context.Context, obj domain.SysDictData) error {
+	return svc.repo.Update(ctx, obj)
+}
