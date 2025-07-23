@@ -5,6 +5,7 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -132,5 +133,56 @@ func (h *SysDictDataHandler) QueryDictDataList(ctx *gin.Context) {
 		"msg":   rescode.Success.String(),
 		"total": total,
 		"rows":  resList,
+	})
+}
+
+// 查询字典数据详情
+func (h *SysDictDataHandler) QueryDictDataType(ctx *gin.Context) {
+	// 获取路径参数 id
+	typeStr := ctx.Param("type")
+
+	domainList, total, err := h.svc.QueryList(ctx, 1, 20, typeStr)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	var resList []resDictDataObj
+	for _, domainObj := range domainList {
+		resList = append(resList, toResDictDataObj(domainObj))
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"total": total,
+		"rows":  resList,
+	})
+}
+
+// 查询字典数据详情
+func (h *SysDictDataHandler) QueryDataDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	dictCodeStr := ctx.Param("dictCode")
+	dictCode, err := strconv.ParseInt(dictCodeStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainObj, err := h.svc.QueryByDictCode(ctx, dictCode)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": toResDictDataObj(domainObj),
 	})
 }

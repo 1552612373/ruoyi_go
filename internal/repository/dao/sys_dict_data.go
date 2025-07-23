@@ -88,3 +88,9 @@ func (dao *SysDictDataDAO) QueryList(ctx context.Context, pageNum int, pageSize 
 
 	return objList, int(total), err
 }
+
+func (dao *SysDictDataDAO) QueryByDictCode(ctx context.Context, dictCode int64) (SysDictData, error) {
+	obj := SysDictData{}
+	err := dao.db.WithContext(ctx).Where("dict_code = ?", dictCode).First(&obj)
+	return obj, err.Error
+}

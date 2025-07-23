@@ -22,7 +22,13 @@ func (h *SysDictDataHandler) RegistRoutes(server *gin.Engine) {
 	{
 		// 新增字典数据
 		group.POST("/system/dict/data", h.AddDictData)
+		// 更新字典数据
+		// group.PUT("/system/dict/data", h.UpdateDictData)
 		// 查询字典数据列表
 		group.GET("/system/dict/data/list", h.QueryDictDataList)
+		// 查询字典数据列表
+		group.GET("/system/dict/data/type/:type", h.QueryDictDataType)
+		// 查询字典数据详情
+		group.GET("/system/dict/data/:dictCode", h.QueryDataDetail)
 	}
 }

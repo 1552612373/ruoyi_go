@@ -151,7 +151,7 @@ func (h *SysDictTypeHandler) UpdateType(ctx *gin.Context) {
 
 }
 
-// 查询字典详情
+// 查询字典类型详情
 func (h *SysDictTypeHandler) QueryTypeDetail(ctx *gin.Context) {
 	// 获取路径参数 id
 	idStr := ctx.Param("id")

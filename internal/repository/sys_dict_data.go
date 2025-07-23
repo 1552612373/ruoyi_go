@@ -20,6 +20,11 @@ func (repo *SysDictDataRepository) Create(ctx context.Context, obj domain.SysDic
 	return repo.dao.Insert(ctx, repo.toDao(obj))
 }
 
+func (repo *SysDictDataRepository) QueryByDictCode(ctx context.Context, dictCode int64) (domain.SysDictData, error) {
+	daoObj, err := repo.dao.QueryByDictCode(ctx, dictCode)
+	return repo.toDomain(daoObj), err
+}
+
 func (repo *SysDictDataRepository) QueryList(ctx context.Context, pageNum int, pageSize int, dictType string) ([]domain.SysDictData, int, error) {
 	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize, dictType)
 	return repo.toDomainList(daoList), total, err
