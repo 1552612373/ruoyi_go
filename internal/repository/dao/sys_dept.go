@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
@@ -50,6 +51,13 @@ type SysDept struct {
 
 	// 更新时间（时间戳）
 	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
+}
+
+type DeptTreeNode struct {
+	ID       int64           `json:"id"`
+	Label    string          `json:"label"`
+	Disabled bool            `json:"disabled"`
+	Children []*DeptTreeNode `json:"children,omitempty"`
 }
 
 type SysDeptDAO struct {
@@ -140,4 +148,64 @@ func (dao *SysDeptDAO) Update(ctx context.Context, obj SysDept) error {
 		}
 	}
 	return err
+}
+
+func (dao *SysDeptDAO) GetDeptTree(ctx context.Context) ([]*DeptTreeNode, error) {
+	var depts []SysDept
+	err := dao.db.Find(&depts).Error
+	if err != nil {
+		return []*DeptTreeNode{}, err
+	}
+
+	tree := BuildDeptTree(depts)
+	return tree, nil
+}
+
+func BuildDeptTree(depts []SysDept) []*DeptTreeNode {
+	// 1. 构建 map，用指针类型
+	deptMap := make(map[int64]*DeptTreeNode)
+	for _, dept := range depts {
+		deptMap[dept.DeptID] = &DeptTreeNode{
+			ID:       dept.DeptID,
+			Label:    dept.DeptName,
+			Disabled: false,
+		}
+	}
+
+	// 2. 构建父子关系
+	var roots []*DeptTreeNode
+	for _, dept := range depts {
+		node := deptMap[dept.DeptID]
+
+		if dept.ParentID == 0 {
+			roots = append(roots, node)
+		} else {
+			if parent, exists := deptMap[dept.ParentID]; exists {
+				parent.Children = append(parent.Children, node)
+			}
+		}
+	}
+
+	// 3. 按 order_num 排序（递归排序）
+	var sortNodes func([]*DeptTreeNode) []*DeptTreeNode
+	sortNodes = func(nodes []*DeptTreeNode) []*DeptTreeNode {
+		sort.Slice(nodes, func(i, j int) bool {
+			return getDeptOrder(depts, nodes[i].ID) < getDeptOrder(depts, nodes[j].ID)
+		})
+		for i := range nodes {
+			nodes[i].Children = sortNodes(nodes[i].Children)
+		}
+		return nodes
+	}
+
+	return sortNodes(roots)
+}
+
+func getDeptOrder(depts []SysDept, id int64) int {
+	for _, dept := range depts {
+		if dept.DeptID == id {
+			return dept.OrderNum
+		}
+	}
+	return 9999
 }

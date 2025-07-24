@@ -4,6 +4,7 @@ import (
 	"context"
 	"go_ruoyi_base/internal/domain"
 	"go_ruoyi_base/internal/repository"
+	"go_ruoyi_base/internal/repository/dao"
 )
 
 type SysDeptService struct {
@@ -34,4 +35,9 @@ func (svc *SysDeptService) QueryByDeptId(ctx context.Context, deptId int64) (dom
 
 func (svc *SysDeptService) Update(ctx context.Context, obj domain.SysDept) error {
 	return svc.repo.Update(ctx, obj)
+}
+
+func (svc *SysDeptService) GetDeptTree(ctx context.Context) ([]*dao.DeptTreeNode, error) {
+	tree, err := svc.repo.GetDeptTree(ctx)
+	return tree, err
 }

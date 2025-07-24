@@ -206,3 +206,20 @@ func (h *SysDeptHandler) UpdateDept(ctx *gin.Context) {
 	})
 
 }
+
+// 查询部门数
+func (h *SysDeptHandler) QueryDeptTree(ctx *gin.Context) {
+
+	treeObj, err := h.svc.GetDeptTree(ctx)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": treeObj,
+	})
+}

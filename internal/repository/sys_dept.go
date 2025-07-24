@@ -39,6 +39,11 @@ func (repo *SysDeptRepository) Update(ctx context.Context, obj domain.SysDept) e
 	return repo.dao.Update(ctx, repo.toDao(obj))
 }
 
+func (repo *SysDeptRepository) GetDeptTree(ctx context.Context) ([]*dao.DeptTreeNode, error) {
+	tree, err := repo.dao.GetDeptTree(ctx)
+	return tree, err
+}
+
 func (repo *SysDeptRepository) toDao(obj domain.SysDept) dao.SysDept {
 	return dao.SysDept{
 		DeptID:     obj.DeptID,
