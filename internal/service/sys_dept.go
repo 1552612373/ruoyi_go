@@ -24,6 +24,10 @@ func (svc *SysDeptService) QueryList(ctx context.Context) ([]domain.SysDept, int
 	return svc.repo.QueryList(ctx)
 }
 
+func (svc *SysDeptService) QueryListExclude(ctx context.Context, excludeDeptId int64) ([]domain.SysDept, int, error) {
+	return svc.repo.QueryListExclude(ctx, excludeDeptId)
+}
+
 func (svc *SysDeptService) QueryByDeptId(ctx context.Context, deptId int64) (domain.SysDept, error) {
 	return svc.repo.QueryByDeptId(ctx, deptId)
 }

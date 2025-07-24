@@ -25,6 +25,11 @@ func (repo *SysDeptRepository) QueryList(ctx context.Context) ([]domain.SysDept,
 	return repo.toDomainList(daoList), total, err
 }
 
+func (repo *SysDeptRepository) QueryListExclude(ctx context.Context, excludeDeptId int64) ([]domain.SysDept, int, error) {
+	daoList, total, err := repo.dao.QueryListExclude(ctx, excludeDeptId)
+	return repo.toDomainList(daoList), total, err
+}
+
 func (repo *SysDeptRepository) QueryByDeptId(ctx context.Context, deptId int64) (domain.SysDept, error) {
 	daoObj, err := repo.dao.QueryByDeptId(ctx, deptId)
 	return repo.toDomain(daoObj), err

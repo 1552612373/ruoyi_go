@@ -20,17 +20,17 @@ func NewSysDeptHandler(svc *service.SysDeptService) *SysDeptHandler {
 func (h *SysDeptHandler) RegistRoutes(server *gin.Engine) {
 	group := server.Group(utility.BASE_API_PRE)
 	{
-		// 新增字典数据
+		// 新增部门
 		group.POST("/system/dept", h.AddDept)
-		// // 更新字典数据
-		// group.PUT("/system/dict/data", h.UpdateDictData)
+		// 更新部门
+		group.PUT("/system/dept", h.UpdateDept)
 		// // 删除字典数据
 		// group.DELETE("/system/dict/data/:dictCode", h.DeleteDictData)
 		// 查询部门列表
 		group.GET("/system/dept/list", h.QueryDeptList)
-		// // 查询字典数据列表
-		// group.GET("/system/dict/data/type/:type", h.QueryDictDataType)
-		// 查询字典数据详情
+		// 查询部门列表exclude （排除节点）
+		group.GET("/system/dept/list/exclude/:deptId", h.QueryDeptListExclude)
+		// 查询部门详情
 		group.GET("/system/dept/:deptId", h.QueryDeptDetail)
 	}
 }

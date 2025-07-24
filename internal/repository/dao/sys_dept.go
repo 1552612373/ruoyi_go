@@ -99,6 +99,31 @@ func (dao *SysDeptDAO) QueryList(ctx context.Context) ([]SysDept, int, error) {
 	return objList, int(total), err
 }
 
+func (dao *SysDeptDAO) QueryListExclude(ctx context.Context, excludeDeptId int64) ([]SysDept, int, error) {
+	objList := []SysDept{}
+	db := dao.db.WithContext(ctx).Model(&SysDept{})
+
+	var total int64
+	var pageNum = 1
+	var pageSize = 1000
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Where("dept_id <> ?", excludeDeptId).Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}
+
 func (dao *SysDeptDAO) QueryByDeptId(ctx context.Context, deptId int64) (SysDept, error) {
 	obj := SysDept{}
 	err := dao.db.WithContext(ctx).Where("dept_id = ?", deptId).First(&obj)

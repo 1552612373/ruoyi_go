@@ -69,22 +69,41 @@ func (h *SysDeptHandler) AddDept(ctx *gin.Context) {
 
 // 查询部门列表
 func (h *SysDeptHandler) QueryDeptList(ctx *gin.Context) {
-	// type typeReq struct {
-	// 	PageNum  int    `form:"pageNum" json:"pageNum"`   // 添加 form 标签
-	// 	PageSize int    `form:"pageSize" json:"pageSize"` // 添加 form 标签
-	// }
-
-	// var req typeReq
-
-	// if err := ctx.ShouldBindQuery(&req); err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"code": rescode.ErrInvalidParam,
-	// 		"msg":  rescode.ErrInvalidParam.String(),
-	// 	})
-	// 	return
-	// }
 
 	domainList, _, err := h.svc.QueryList(ctx)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	resList := []domain.SysDept{}
+	for _, domainObj := range domainList {
+		// resList = append(resList, toResDictDataObj(domainObj))
+		resList = append(resList, domainObj)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": resList,
+	})
+}
+
+// 查询部门列表exclude （排除节点）
+func (h *SysDeptHandler) QueryDeptListExclude(ctx *gin.Context) {
+
+	// 获取路径参数 id
+	deptIdStr := ctx.Param("deptId")
+	deptId, err := strconv.ParseInt(deptIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainList, _, err := h.svc.QueryListExclude(ctx, deptId)
 	if err != nil {
 		utility.ThrowSysErrowIfneeded(ctx, err)
 		return
