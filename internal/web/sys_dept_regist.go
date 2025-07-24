@@ -21,7 +21,7 @@ func (h *SysDeptHandler) RegistRoutes(server *gin.Engine) {
 	group := server.Group(utility.BASE_API_PRE)
 	{
 		// 新增字典数据
-		// group.POST("/system/dict/data", h.AddDictData)
+		group.POST("/system/dept", h.AddDept)
 		// // 更新字典数据
 		// group.PUT("/system/dict/data", h.UpdateDictData)
 		// // 删除字典数据
