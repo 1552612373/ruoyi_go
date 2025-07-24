@@ -30,7 +30,7 @@ func (h *SysDeptHandler) RegistRoutes(server *gin.Engine) {
 		group.GET("/system/dept/list", h.QueryDeptList)
 		// // 查询字典数据列表
 		// group.GET("/system/dict/data/type/:type", h.QueryDictDataType)
-		// // 查询字典数据详情
-		// group.GET("/system/dict/data/:dictCode", h.QueryDataDetail)
+		// 查询字典数据详情
+		group.GET("/system/dept/:deptId", h.QueryDeptDetail)
 	}
 }

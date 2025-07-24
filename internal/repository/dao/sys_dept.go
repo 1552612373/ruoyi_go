@@ -98,3 +98,9 @@ func (dao *SysDeptDAO) QueryList(ctx context.Context) ([]SysDept, int, error) {
 
 	return objList, int(total), err
 }
+
+func (dao *SysDeptDAO) QueryByDeptId(ctx context.Context, deptId int64) (SysDept, error) {
+	obj := SysDept{}
+	err := dao.db.WithContext(ctx).Where("dept_id = ?", deptId).First(&obj)
+	return obj, err.Error
+}

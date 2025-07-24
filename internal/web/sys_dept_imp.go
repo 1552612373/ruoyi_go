@@ -5,12 +5,13 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// 新增字典数据
+// 新增部门
 func (h *SysDeptHandler) AddDept(ctx *gin.Context) {
 	type deptReq struct {
 		DeptName string `json:"deptName" binding:"required"`
@@ -66,7 +67,7 @@ func (h *SysDeptHandler) AddDept(ctx *gin.Context) {
 
 }
 
-// 查询字典数据列表
+// 查询部门列表
 func (h *SysDeptHandler) QueryDeptList(ctx *gin.Context) {
 	// type typeReq struct {
 	// 	PageNum  int    `form:"pageNum" json:"pageNum"`   // 添加 form 标签
@@ -99,5 +100,32 @@ func (h *SysDeptHandler) QueryDeptList(ctx *gin.Context) {
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
 		"data": resList,
+	})
+}
+
+// 查询部门详情
+func (h *SysDeptHandler) QueryDeptDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	deptIdStr := ctx.Param("deptId")
+	deptId, err := strconv.ParseInt(deptIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainObj, err := h.svc.QueryByDeptId(ctx, deptId)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": domainObj,
 	})
 }
