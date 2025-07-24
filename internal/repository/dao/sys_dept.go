@@ -1,51 +1,100 @@
 package dao
 
-import "time"
+import (
+	"context"
+	"errors"
 
-// SysDept 部门信息表(sys_dept)
+	"github.com/go-sql-driver/mysql"
+	"gorm.io/gorm"
+)
+
 type SysDept struct {
-	// 部门ID（主键）
-	DeptId int64 `json:"deptId" gorm:"column:dept_id;primaryKey;autoIncrement"`
+	// 部门id
+	DeptID int64 `gorm:"column:dept_id;primaryKey;autoIncrement" json:"deptId"`
 
-	// 父部门ID（顶级部门为0）
-	ParentId int64 `json:"parentId" gorm:"column:parent_id"`
+	// 父部门id
+	ParentID int64 `gorm:"column:parent_id" json:"parentId"`
 
-	// 祖级部门ID集合（逗号分隔，如：0,1,2）
-	Ancestors string `json:"ancestors" gorm:"column:ancestors"`
+	// 祖级列表
+	Ancestors string `gorm:"column:ancestors" json:"ancestors"`
 
 	// 部门名称
-	DeptName string `json:"deptName" gorm:"column:dept_name"`
+	DeptName string `gorm:"column:dept_name" json:"deptName"`
 
-	// 显示顺序（用于排序）
-	OrderNum int `json:"orderNum" gorm:"column:order_num"`
+	// 显示顺序
+	OrderNum int `gorm:"column:order_num" json:"orderNum"`
 
-	// 负责人名称
-	Leader string `json:"leader" gorm:"column:leader"`
+	// 负责人
+	Leader *string `gorm:"column:leader" json:"leader"`
 
 	// 联系电话
-	Phone string `json:"phone" gorm:"column:phone"`
+	Phone *string `gorm:"column:phone" json:"phone"`
 
 	// 邮箱
-	Email string `json:"email" gorm:"column:email"`
+	Email *string `gorm:"column:email" json:"email"`
 
-	// 部门状态（0-正常，1-停用）
-	Status string `json:"status" gorm:"column:status"`
+	// 部门状态（0正常 1停用）
+	Status string `gorm:"column:status" json:"status"`
 
-	// 删除标志（0-正常，1-已删除）
-	DelFlag string `json:"delFlag" gorm:"column:del_flag"`
+	// 删除标志（0代表存在 2代表删除）
+	DelFlag string `gorm:"column:del_flag" json:"delFlag"`
 
-	// 父部门名称（非数据库字段，用于展示）
-	ParentName string `json:"parentName" gorm:"-"`
+	// 创建者
+	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
-	// 创建人（操作者用户名）
-	CreateBy string `json:"createBy" gorm:"column:create_by"`
+	// 创建时间（时间戳）
+	CreateTime int64 `gorm:"column:create_time" json:"createTime"`
 
-	// 创建时间
-	CreateTime time.Time `json:"createTime" gorm:"column:create_time"`
+	// 更新者
+	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
-	// 最后更新人
-	UpdateBy string `json:"updateBy" gorm:"column:update_by"`
+	// 更新时间（时间戳）
+	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
+}
 
-	// 最后更新时间
-	UpdateTime time.Time `json:"updateTime" gorm:"column:update_time"`
+type SysDeptDAO struct {
+	db *gorm.DB
+}
+
+func NewSysDeptDAO(db *gorm.DB) *SysDeptDAO {
+	return &SysDeptDAO{
+		db: db,
+	}
+}
+
+func (dao *SysDeptDAO) Insert(ctx context.Context, obj SysDept) error {
+	err := dao.db.WithContext(ctx).Create(&obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}
+
+func (dao *SysDeptDAO) QueryList(ctx context.Context) ([]SysDept, int, error) {
+	objList := []SysDept{}
+	db := dao.db.WithContext(ctx).Model(&SysDept{})
+
+	var total int64
+	var pageNum = 1
+	var pageSize = 1000
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
 }

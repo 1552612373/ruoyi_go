@@ -35,6 +35,9 @@ func main() {
 	sysDictDataHandler := initSysDictData(db)
 	sysDictDataHandler.RegistRoutes(server)
 
+	sysDeptHandler := initSysDept(db)
+	sysDeptHandler.RegistRoutes(server)
+
 	for _, route := range server.Routes() {
 		log.Printf("HTTP %s --> %s\n", route.Method, route.Path)
 	}
@@ -147,5 +150,13 @@ func initSysDictData(db *gorm.DB) *web.SysDictDataHandler {
 	myRepo := repository.NewSysDictDataRepository(myDao)
 	mySvc := service.NewSysDictDataService(myRepo)
 	myHandler := web.NewSysDictDataHandler(mySvc)
+	return myHandler
+}
+
+func initSysDept(db *gorm.DB) *web.SysDeptHandler {
+	myDao := dao.NewSysDeptDAO(db)
+	myRepo := repository.NewSysDeptRepository(myDao)
+	mySvc := service.NewSysDeptService(myRepo)
+	myHandler := web.NewSysDeptHandler(mySvc)
 	return myHandler
 }

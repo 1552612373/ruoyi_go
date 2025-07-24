@@ -123,7 +123,7 @@ func (h *SysDictDataHandler) QueryDictDataList(ctx *gin.Context) {
 		return
 	}
 
-	var resList []domain.SysDictData
+	resList := []domain.SysDictData{}
 	for _, domainObj := range domainList {
 		// resList = append(resList, toResDictDataObj(domainObj))
 		resList = append(resList, domainObj)
@@ -148,7 +148,7 @@ func (h *SysDictDataHandler) QueryDictDataType(ctx *gin.Context) {
 		return
 	}
 
-	var resList []domain.SysDictData
+	resList := []domain.SysDictData{}
 	for _, domainObj := range domainList {
 		resList = append(resList, domainObj)
 	}

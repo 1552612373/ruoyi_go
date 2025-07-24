@@ -227,7 +227,7 @@ func (h *SysDictTypeHandler) QueryTypeList(ctx *gin.Context) {
 		return
 	}
 
-	var resList []resDictTypeObj
+	resList := []resDictTypeObj{}
 	for _, domainObj := range domainList {
 		resList = append(resList, toResDictTypeObj(domainObj))
 	}
