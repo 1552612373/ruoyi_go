@@ -35,6 +35,10 @@ func (repo *SysDeptRepository) QueryByDeptId(ctx context.Context, deptId int64) 
 	return repo.toDomain(daoObj), err
 }
 
+func (repo *SysDeptRepository) Update(ctx context.Context, obj domain.SysDept) error {
+	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
 func (repo *SysDeptRepository) toDao(obj domain.SysDept) dao.SysDept {
 	return dao.SysDept{
 		DeptID:     obj.DeptID,

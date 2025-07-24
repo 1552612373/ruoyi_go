@@ -148,3 +148,61 @@ func (h *SysDeptHandler) QueryDeptDetail(ctx *gin.Context) {
 		"data": domainObj,
 	})
 }
+
+// 更新部门
+func (h *SysDeptHandler) UpdateDept(ctx *gin.Context) {
+
+	type deptReq struct {
+		Ancestors  string `json:"ancestors"`
+		CreateBy   string `json:"createBy"`
+		CreateTime int64  `json:"createTime"`
+		DelFlag    string `json:"delFlag" `
+		DeptId     int64  `json:"deptId"`
+		DeptName   string `json:"deptName"`
+		Email      string `json:"email"`
+		Leader     string `json:"leader"`
+		OrderNum   int    `json:"orderNum"`
+		ParentId   int64  `json:"parentId"`
+		Phone      string `json:"phone"`
+		Status     string `json:"status"`
+		UpdateBy   string `json:"updateBy"`
+		UpdateTime int64  `json:"updateTime"`
+	}
+
+	var req deptReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	err := h.svc.Update(ctx, domain.SysDept{
+		Ancestors:  req.Ancestors,
+		CreateBy:   req.CreateBy,
+		CreateTime: req.CreateTime,
+		DelFlag:    req.DelFlag,
+		DeptID:     req.DeptId,
+		DeptName:   req.DeptName,
+		Email:      &req.Email,
+		Leader:     &req.Leader,
+		OrderNum:   req.OrderNum,
+		ParentID:   req.ParentId,
+		Phone:      &req.Phone,
+		Status:     req.Status,
+		UpdateBy:   req.UpdateBy,
+		UpdateTime: req.UpdateTime,
+	})
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
+}

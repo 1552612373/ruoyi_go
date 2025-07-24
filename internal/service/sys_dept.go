@@ -31,3 +31,7 @@ func (svc *SysDeptService) QueryListExclude(ctx context.Context, excludeDeptId i
 func (svc *SysDeptService) QueryByDeptId(ctx context.Context, deptId int64) (domain.SysDept, error) {
 	return svc.repo.QueryByDeptId(ctx, deptId)
 }
+
+func (svc *SysDeptService) Update(ctx context.Context, obj domain.SysDept) error {
+	return svc.repo.Update(ctx, obj)
+}

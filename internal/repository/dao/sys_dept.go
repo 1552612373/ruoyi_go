@@ -129,3 +129,15 @@ func (dao *SysDeptDAO) QueryByDeptId(ctx context.Context, deptId int64) (SysDept
 	err := dao.db.WithContext(ctx).Where("dept_id = ?", deptId).First(&obj)
 	return obj, err.Error
 }
+
+func (dao *SysDeptDAO) Update(ctx context.Context, obj SysDept) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("dept_id = ?", obj.DeptID).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}
