@@ -24,14 +24,14 @@ func (h *SysDictTypeHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/system/dict/type", h.AddDictType)
 		// 更新字典类型
 		group.PUT("/system/dict/type", h.UpdateType)
-		// 删除字典类型
-		group.DELETE("/system/dict/type/:id", h.DeleteType)
 		// 查询字典类型列表
 		group.GET("/system/dict/type/list", h.QueryTypeList)
 		// 查询字典类型下拉列表
 		group.GET("/system/dict/type/optionselect", h.QueryOptionselect)
 		// 查询字典类型详情
 		group.GET("/system/dict/type/:id", h.QueryTypeDetail)
+		// 删除字典类型
+		group.DELETE("/system/dict/type/:id", h.DeleteType)
 
 	}
 }

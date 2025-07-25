@@ -29,6 +29,16 @@ func (repo *SysPostRepository) Update(ctx context.Context, obj domain.SysPost) e
 	return repo.dao.Update(ctx, repo.toDao(obj))
 }
 
+func (repo *SysPostRepository) QueryById(ctx context.Context, id int64) (domain.SysPost, error) {
+	daoObj, err := repo.dao.QueryById(ctx, id)
+	return repo.toDomain(daoObj), err
+}
+
+func (repo *SysPostRepository) DeleteById(ctx context.Context, id int64) error {
+	err := repo.dao.DeleteById(ctx, id)
+	return err
+}
+
 func (repo *SysPostRepository) toDao(obj domain.SysPost) dao.SysPost {
 	return dao.SysPost{
 		PostID:     obj.PostID,

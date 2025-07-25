@@ -20,11 +20,6 @@ func (repo *SysDictTypeRepository) Create(ctx context.Context, obj domain.SysDic
 	return repo.dao.Insert(ctx, repo.toDao(obj))
 }
 
-func (repo *SysDictTypeRepository) QueryByDictId(ctx context.Context, dictId int64) (domain.SysDictType, error) {
-	daoObj, err := repo.dao.QueryByDictId(ctx, dictId)
-	return repo.toDomain(daoObj), err
-}
-
 func (repo *SysDictTypeRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysDictType, int, error) {
 	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
 	return repo.toDomainList(daoList), total, err
@@ -32,6 +27,11 @@ func (repo *SysDictTypeRepository) QueryList(ctx context.Context, pageNum int, p
 
 func (repo *SysDictTypeRepository) Update(ctx context.Context, obj domain.SysDictType) error {
 	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
+func (repo *SysDictTypeRepository) QueryByDictId(ctx context.Context, dictId int64) (domain.SysDictType, error) {
+	daoObj, err := repo.dao.QueryByDictId(ctx, dictId)
+	return repo.toDomain(daoObj), err
 }
 
 func (repo *SysDictTypeRepository) DeleteByDictId(ctx context.Context, dictId int64) error {

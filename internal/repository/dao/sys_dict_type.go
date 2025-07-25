@@ -63,12 +63,6 @@ func (dao *SysDictTypeDAO) Insert(ctx context.Context, obj SysDictType) error {
 	return err
 }
 
-func (dao *SysDictTypeDAO) QueryByDictId(ctx context.Context, dictId int64) (SysDictType, error) {
-	obj := SysDictType{}
-	err := dao.db.WithContext(ctx).Where("dict_id = ?", dictId).First(&obj)
-	return obj, err.Error
-}
-
 func (dao *SysDictTypeDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysDictType, int, error) {
 	objList := []SysDictType{}
 	db := dao.db.WithContext(ctx).Model(&SysDictType{})
@@ -102,6 +96,12 @@ func (dao *SysDictTypeDAO) Update(ctx context.Context, obj SysDictType) error {
 		}
 	}
 	return err
+}
+
+func (dao *SysDictTypeDAO) QueryByDictId(ctx context.Context, dictId int64) (SysDictType, error) {
+	obj := SysDictType{}
+	err := dao.db.WithContext(ctx).Where("dict_id = ?", dictId).First(&obj)
+	return obj, err.Error
 }
 
 func (dao *SysDictTypeDAO) DeleteByDictId(ctx context.Context, dictId int64) error {

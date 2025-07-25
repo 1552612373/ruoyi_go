@@ -5,6 +5,7 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -183,4 +184,57 @@ func (h *SysPostHandler) QueryPostList(ctx *gin.Context) {
 		"total": total,
 		"rows":  resList,
 	})
+}
+
+// 查询岗位详情
+func (h *SysPostHandler) QueryPostDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainObj, err := h.svc.QueryById(ctx, id)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": toResPostObj(domainObj),
+	})
+}
+
+// 删除岗位
+func (h *SysPostHandler) DeletePost(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	errx := h.svc.DeleteByDictId(ctx, id)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, errx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
 }

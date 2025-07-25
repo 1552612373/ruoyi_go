@@ -20,12 +20,12 @@ func (svc *SysDictTypeService) Create(ctx context.Context, obj domain.SysDictTyp
 	return svc.repo.Create(ctx, obj)
 }
 
-func (svc *SysDictTypeService) QueryByDictId(ctx context.Context, dictId int64) (domain.SysDictType, error) {
-	return svc.repo.QueryByDictId(ctx, dictId)
-}
-
 func (svc *SysDictTypeService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysDictType, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
+}
+
+func (svc *SysDictTypeService) QueryByDictId(ctx context.Context, dictId int64) (domain.SysDictType, error) {
+	return svc.repo.QueryByDictId(ctx, dictId)
 }
 
 func (svc *SysDictTypeService) DeleteByDictId(ctx context.Context, dictId int64) error {

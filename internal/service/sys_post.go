@@ -27,3 +27,11 @@ func (svc *SysPostService) QueryList(ctx context.Context, pageNum int, pageSize 
 func (svc *SysPostService) Update(ctx context.Context, obj domain.SysPost) error {
 	return svc.repo.Update(ctx, obj)
 }
+
+func (svc *SysPostService) QueryById(ctx context.Context, id int64) (domain.SysPost, error) {
+	return svc.repo.QueryById(ctx, id)
+}
+
+func (svc *SysPostService) DeleteByDictId(ctx context.Context, id int64) error {
+	return svc.repo.DeleteById(ctx, id)
+}

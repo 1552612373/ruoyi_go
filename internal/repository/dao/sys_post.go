@@ -87,3 +87,14 @@ func (dao *SysPostDAO) Update(ctx context.Context, obj SysPost) error {
 	}
 	return err
 }
+
+func (dao *SysPostDAO) QueryById(ctx context.Context, id int64) (SysPost, error) {
+	obj := SysPost{}
+	err := dao.db.WithContext(ctx).Where("post_id = ?", id).First(&obj)
+	return obj, err.Error
+}
+
+func (dao *SysPostDAO) DeleteById(ctx context.Context, id int64) error {
+	err := dao.db.WithContext(ctx).Where("post_id = ?", id).Delete(&SysPost{}).Error
+	return err
+}
