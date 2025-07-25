@@ -12,9 +12,9 @@ import (
 )
 
 type resUserObj struct {
-	DictId     int64  `json:"dictId"`
-	DictName   string `json:"dictName"`
-	DictType   string `json:"dictType"`
+	UserId     int64  `json:"userId"`
+	UserName   string `json:"userName"`
+	NickName   string `json:"nickName"`
 	Status     string `json:"status"`
 	CreateBy   string `json:"createBy"`
 	CreateTime string `json:"createTime"`
@@ -24,16 +24,20 @@ type resUserObj struct {
 }
 
 func toResUserObj(domainObj domain.SysUser) resUserObj {
+	remark := ""
+	if domainObj.Remark == nil {
+		domainObj.Remark = &remark
+	}
 	return resUserObj{
-		// DictId:     domainObj.DictId,
-		// DictName:   domainObj.DictName,
-		// DictType:   domainObj.DictType,
-		// Status:     domainObj.Status,
-		// Remark:     domainObj.Remark,
-		// UpdateBy:   domainObj.UpdateBy,
-		// UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
-		// CreateBy:   domainObj.CreateBy,
-		// CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+		UserId:     domainObj.UserID,
+		UserName:   domainObj.UserName,
+		NickName:   domainObj.NickName,
+		Status:     domainObj.Status,
+		Remark:     remark,
+		UpdateBy:   domainObj.UpdateBy,
+		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		CreateBy:   domainObj.CreateBy,
+		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
 	}
 }
 
@@ -353,36 +357,36 @@ func (h *SysUserHandler) VoidResponse(ctx *gin.Context) {
 
 // 查询用户列表
 func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
-	// type typeReq struct {
-	// 	PageNum  int `json:"pageNum" form:"pageNum"`
-	// 	PageSize int `json:"pageSize" form:"pageSize"`
-	// }
+	type typeReq struct {
+		PageNum  int `json:"pageNum" form:"pageNum"`
+		PageSize int `json:"pageSize" form:"pageSize"`
+	}
 
-	// var req typeReq
+	var req typeReq
 
-	// if err := ctx.ShouldBindQuery(&req); err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"code": rescode.ErrInvalidParam,
-	// 		"msg":  rescode.ErrInvalidParam.String(),
-	// 	})
-	// 	return
-	// }
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
 
-	// domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
-	// if err != nil {
-	// 	utility.ThrowSysErrowIfneeded(ctx, err)
-	// 	return
-	// }
+	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-	// resList := []resDictTypeObj{}
-	// for _, domainObj := range domainList {
-	// 	resList = append(resList, resDictTypeObj(domainObj))
-	// }
+	resList := []resUserObj{}
+	for _, domainObj := range domainList {
+		resList = append(resList, toResUserObj(domainObj))
+	}
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code":  rescode.Success,
-	// 	"msg":   rescode.Success.String(),
-	// 	"total": total,
-	// 	"rows":  resList,
-	// })
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"total": total,
+		"rows":  resList,
+	})
 }
