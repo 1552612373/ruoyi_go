@@ -107,3 +107,26 @@ func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, error) 
 	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
 	return sysUser, err
 }
+
+func (dao *SysUserDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysUser, int, error) {
+	objList := []SysUser{}
+	db := dao.db.WithContext(ctx).Model(&SysUser{})
+
+	var total int64
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}

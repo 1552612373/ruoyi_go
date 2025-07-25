@@ -25,8 +25,12 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/logout", h.Logout)
 		group.GET("/getInfo", h.GetInfo)
 
+		// 查询用户列表
+		group.GET("/system/user/list", h.QueryUserList)
+
 		// 临时
 		group.GET("/getRouters", h.GetRouters)
+
 	}
 
 }

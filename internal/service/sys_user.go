@@ -45,3 +45,7 @@ func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUse
 	}
 	return ad, nil
 }
+
+func (svc *SysUserService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
+	return svc.repo.QueryList(ctx, pageNum, pageSize)
+}

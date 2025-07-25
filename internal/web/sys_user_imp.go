@@ -2,6 +2,7 @@ package web
 
 import (
 	utility "go_ruoyi_base/Utility"
+	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
 	"time"
@@ -9,6 +10,32 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+type resUserObj struct {
+	DictId     int64  `json:"dictId"`
+	DictName   string `json:"dictName"`
+	DictType   string `json:"dictType"`
+	Status     string `json:"status"`
+	CreateBy   string `json:"createBy"`
+	CreateTime string `json:"createTime"`
+	UpdateBy   string `json:"updateBy"`
+	UpdateTime string `json:"updateTime"`
+	Remark     string `json:"remark"`
+}
+
+func toResUserObj(domainObj domain.SysUser) resUserObj {
+	return resUserObj{
+		// DictId:     domainObj.DictId,
+		// DictName:   domainObj.DictName,
+		// DictType:   domainObj.DictType,
+		// Status:     domainObj.Status,
+		// Remark:     domainObj.Remark,
+		// UpdateBy:   domainObj.UpdateBy,
+		// UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		// CreateBy:   domainObj.CreateBy,
+		// CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+	}
+}
 
 func (h *SysUserHandler) Signup(ctx *gin.Context) {
 	type SignupReq struct {
@@ -315,4 +342,40 @@ func (h *SysUserHandler) GetRouters(ctx *gin.Context) {
 			},
 		},
 	})
+}
+
+// 查询用户列表
+func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
+	// type typeReq struct {
+	// 	PageNum  int `json:"pageNum" form:"pageNum"`
+	// 	PageSize int `json:"pageSize" form:"pageSize"`
+	// }
+
+	// var req typeReq
+
+	// if err := ctx.ShouldBindQuery(&req); err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{
+	// 		"code": rescode.ErrInvalidParam,
+	// 		"msg":  rescode.ErrInvalidParam.String(),
+	// 	})
+	// 	return
+	// }
+
+	// domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	// if err != nil {
+	// 	utility.ThrowSysErrowIfneeded(ctx, err)
+	// 	return
+	// }
+
+	// resList := []resDictTypeObj{}
+	// for _, domainObj := range domainList {
+	// 	resList = append(resList, resDictTypeObj(domainObj))
+	// }
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"code":  rescode.Success,
+	// 	"msg":   rescode.Success.String(),
+	// 	"total": total,
+	// 	"rows":  resList,
+	// })
 }

@@ -32,6 +32,11 @@ func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.S
 	return domainSysUser, err
 }
 
+func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
+	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
+	return repo.toDomainList(daoList), total, err
+}
+
 func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	return dao.SysUser{
 		UserID:        obj.UserID,
@@ -80,4 +85,13 @@ func (repo *SysUserRepository) toDomain(obj dao.SysUser) domain.SysUser {
 		UpdateTime:    obj.UpdateTime,
 		Remark:        obj.Remark,
 	}
+}
+
+func (repo *SysUserRepository) toDomainList(daoList []dao.SysUser) []domain.SysUser {
+	domainList := []domain.SysUser{}
+	for _, daoObj := range daoList {
+		domainObj := repo.toDomain(daoObj)
+		domainList = append(domainList, domainObj)
+	}
+	return domainList
 }
