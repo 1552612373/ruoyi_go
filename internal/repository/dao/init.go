@@ -9,5 +9,6 @@ func InitTable(db *gorm.DB) error {
 	db.AutoMigrate(&SysDictType{})
 	db.AutoMigrate(&SysDictData{})
 	db.AutoMigrate(&SysUser{})
+	db.AutoMigrate(&SysPost{})
 	return db.AutoMigrate(&SysRole{})
 }

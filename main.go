@@ -38,6 +38,9 @@ func main() {
 	sysDeptHandler := initSysDept(db)
 	sysDeptHandler.RegistRoutes(server)
 
+	SysPostHandler := initSysPost(db)
+	SysPostHandler.RegistRoutes(server)
+
 	for _, route := range server.Routes() {
 		log.Printf("HTTP %s --> %s\n", route.Method, route.Path)
 	}
@@ -158,5 +161,13 @@ func initSysDept(db *gorm.DB) *web.SysDeptHandler {
 	myRepo := repository.NewSysDeptRepository(myDao)
 	mySvc := service.NewSysDeptService(myRepo)
 	myHandler := web.NewSysDeptHandler(mySvc)
+	return myHandler
+}
+
+func initSysPost(db *gorm.DB) *web.SysPostHandler {
+	myDao := dao.NewSysPostDAO(db)
+	myRepo := repository.NewSysPostRepository(myDao)
+	mySvc := service.NewSysPostService(myRepo)
+	myHandler := web.NewSysPostHandler(mySvc)
 	return myHandler
 }

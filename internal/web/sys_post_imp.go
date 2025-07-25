@@ -1,0 +1,121 @@
+package web
+
+import (
+	utility "go_ruoyi_base/Utility"
+	"go_ruoyi_base/internal/domain"
+	rescode "go_ruoyi_base/resCode"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+// 新增岗位
+func (h *SysPostHandler) AddPost(ctx *gin.Context) {
+	type addReq struct {
+		PostCode string `json:"postCode"`
+		PostName string `json:"postName"`
+		PostSort int32  `json:"postSort"`
+		Remark   string `json:"remark"`
+		Status   string `json:"status"`
+	}
+
+	var req addReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrUserUnauthorized,
+			"msg":  rescode.ErrUserUnauthorized.String(),
+		})
+	}
+	now := time.Now().UnixMilli()
+
+	err := h.svc.Create(ctx, domain.SysPost{
+		PostCode:   req.PostCode,
+		PostName:   req.PostName,
+		PostSort:   req.PostSort,
+		Remark:     &req.Remark,
+		Status:     req.Status,
+		CreateBy:   claimsObj.UserName,
+		CreateTime: now,
+	})
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
+}
+
+// 编辑岗位
+func (h *SysPostHandler) UpdatePost(ctx *gin.Context) {
+	type addReq struct {
+		PostId     int64  `json:"postId" binding:"required"`
+		CreateBy   string `json:"createBy"`
+		CreateTime string `json:"createTime"`
+		Flag       bool   `json:"flag"`
+		PostCode   string `json:"postCode"`
+		PostName   string `json:"postName"`
+		PostSort   int32  `json:"postSort"`
+		Remark     string `json:"remark"`
+		Status     string `json:"status"`
+		UpdateBy   string `json:"updateBy"`
+		UpdateTime string `json:"updateTime"`
+	}
+
+	var req addReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrUserUnauthorized,
+			"msg":  rescode.ErrUserUnauthorized.String(),
+		})
+	}
+	now := time.Now().UnixMilli()
+
+	err := h.svc.Create(ctx, domain.SysPost{
+		PostID: req.PostId,
+		// Flag:       req.Flag,
+		PostCode:   req.PostCode,
+		PostName:   req.PostName,
+		PostSort:   req.PostSort,
+		Remark:     &req.Remark,
+		Status:     req.Status,
+		UpdateBy:   claimsObj.UserName,
+		UpdateTime: now,
+		CreateBy:   claimsObj.UserName,
+		CreateTime: now,
+	})
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
+}
