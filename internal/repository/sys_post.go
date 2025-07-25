@@ -25,6 +25,10 @@ func (repo *SysPostRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
+func (repo *SysPostRepository) Update(ctx context.Context, obj domain.SysPost) error {
+	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
 func (repo *SysPostRepository) toDao(obj domain.SysPost) dao.SysPost {
 	return dao.SysPost{
 		PostID:     obj.PostID,

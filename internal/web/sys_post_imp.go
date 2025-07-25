@@ -124,7 +124,7 @@ func (h *SysPostHandler) UpdatePost(ctx *gin.Context) {
 	}
 	now := time.Now().UnixMilli()
 
-	err := h.svc.Create(ctx, domain.SysPost{
+	err := h.svc.Update(ctx, domain.SysPost{
 		PostID: req.PostId,
 		// Flag:       req.Flag,
 		PostCode:   req.PostCode,

@@ -75,3 +75,15 @@ func (dao *SysPostDAO) QueryList(ctx context.Context, pageNum int, pageSize int)
 
 	return objList, int(total), err
 }
+
+func (dao *SysPostDAO) Update(ctx context.Context, obj SysPost) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("post_id = ?", obj.PostID).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}

@@ -23,3 +23,7 @@ func (svc *SysPostService) Create(ctx context.Context, obj domain.SysPost) error
 func (svc *SysPostService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysPost, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
 }
+
+func (svc *SysPostService) Update(ctx context.Context, obj domain.SysPost) error {
+	return svc.repo.Update(ctx, obj)
+}
