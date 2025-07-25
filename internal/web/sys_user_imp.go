@@ -344,6 +344,13 @@ func (h *SysUserHandler) GetRouters(ctx *gin.Context) {
 	})
 }
 
+func (h *SysUserHandler) VoidResponse(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":  "操作成功",
+		"code": 200,
+	})
+}
+
 // 查询用户列表
 func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
 	// type typeReq struct {

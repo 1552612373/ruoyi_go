@@ -30,6 +30,7 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 
 		// 临时
 		group.GET("/getRouters", h.GetRouters)
+		group.GET("/system/config/configKey/sys.user.initPassword", h.VoidResponse)
 
 	}
 
