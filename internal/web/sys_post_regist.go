@@ -22,6 +22,7 @@ func (h *SysPostHandler) RegistRoutes(server *gin.Engine) {
 	{
 		// 新增岗位
 		group.POST("/system/post", h.AddPost)
-
+		// 新增岗位
+		group.GET("/system/post/list", h.QueryPostList)
 	}
 }

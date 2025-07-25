@@ -52,3 +52,26 @@ func (dao *SysPostDAO) Insert(ctx context.Context, obj SysPost) error {
 	}
 	return err
 }
+
+func (dao *SysPostDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysPost, int, error) {
+	objList := []SysPost{}
+	db := dao.db.WithContext(ctx).Model(&SysPost{})
+
+	var total int64
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}

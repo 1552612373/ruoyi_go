@@ -10,6 +10,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type resPostObj struct {
+	PostId     int64  `json:"postId" binding:"required"`
+	CreateBy   string `json:"createBy"`
+	CreateTime string `json:"createTime"`
+	Flag       bool   `json:"flag"`
+	PostCode   string `json:"postCode"`
+	PostName   string `json:"postName"`
+	PostSort   int32  `json:"postSort"`
+	Remark     string `json:"remark"`
+	Status     string `json:"status"`
+	UpdateBy   string `json:"updateBy"`
+	UpdateTime string `json:"updateTime"`
+}
+
+func toResPostObj(domainObj domain.SysPost) resPostObj {
+	return resPostObj{
+		PostId:     domainObj.PostID,
+		CreateBy:   domainObj.CreateBy,
+		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+		PostCode:   domainObj.PostCode,
+		PostName:   domainObj.PostName,
+		PostSort:   domainObj.PostSort,
+		Remark:     *domainObj.Remark,
+		Status:     domainObj.Status,
+		UpdateBy:   domainObj.UpdateBy,
+		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+	}
+}
+
 // 新增岗位
 func (h *SysPostHandler) AddPost(ctx *gin.Context) {
 	type addReq struct {
@@ -118,4 +147,40 @@ func (h *SysPostHandler) UpdatePost(ctx *gin.Context) {
 		"msg":  rescode.Success.String(),
 	})
 
+}
+
+// 查询岗位列表
+func (h *SysPostHandler) QueryPostList(ctx *gin.Context) {
+	type typeReq struct {
+		PageNum  int `json:"pageNum" form:"pageNum"`
+		PageSize int `json:"pageSize" form:"pageSize"`
+	}
+
+	var req typeReq
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	resList := []resPostObj{}
+	for _, domainObj := range domainList {
+		resList = append(resList, toResPostObj(domainObj))
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"total": total,
+		"rows":  resList,
+	})
 }

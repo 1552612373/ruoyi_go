@@ -20,6 +20,11 @@ func (repo *SysPostRepository) Create(ctx context.Context, obj domain.SysPost) e
 	return repo.dao.Insert(ctx, repo.toDao(obj))
 }
 
+func (repo *SysPostRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysPost, int, error) {
+	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
+	return repo.toDomainList(daoList), total, err
+}
+
 func (repo *SysPostRepository) toDao(obj domain.SysPost) dao.SysPost {
 	return dao.SysPost{
 		PostID:     obj.PostID,
