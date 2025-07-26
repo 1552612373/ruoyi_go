@@ -23,3 +23,15 @@ func (svc *SysMenuService) Create(ctx context.Context, obj domain.SysMenu) error
 func (svc *SysMenuService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysMenu, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
 }
+
+func (svc *SysMenuService) Update(ctx context.Context, obj domain.SysMenu) error {
+	return svc.repo.Update(ctx, obj)
+}
+
+func (svc *SysMenuService) QueryById(ctx context.Context, id int64) (domain.SysMenu, error) {
+	return svc.repo.QueryById(ctx, id)
+}
+
+func (svc *SysMenuService) DeleteByDictId(ctx context.Context, id int64) error {
+	return svc.repo.DeleteById(ctx, id)
+}

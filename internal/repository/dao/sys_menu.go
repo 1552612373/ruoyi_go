@@ -115,3 +115,26 @@ func (dao *SysMenuDAO) QueryList(ctx context.Context, pageNum int, pageSize int)
 
 	return objList, int(total), err
 }
+
+func (dao *SysMenuDAO) Update(ctx context.Context, obj SysMenu) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("menu_id = ?", obj.MenuID).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}
+
+func (dao *SysMenuDAO) QueryById(ctx context.Context, id int64) (SysMenu, error) {
+	obj := SysMenu{}
+	err := dao.db.WithContext(ctx).Where("menu_id = ?", id).First(&obj)
+	return obj, err.Error
+}
+
+func (dao *SysMenuDAO) DeleteById(ctx context.Context, id int64) error {
+	err := dao.db.WithContext(ctx).Where("menu_id = ?", id).Delete(&SysMenu{}).Error
+	return err
+}

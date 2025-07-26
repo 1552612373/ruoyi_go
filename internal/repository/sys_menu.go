@@ -25,6 +25,20 @@ func (repo *SysMenuRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
+func (repo *SysMenuRepository) Update(ctx context.Context, obj domain.SysMenu) error {
+	return repo.dao.Update(ctx, repo.toDao(obj))
+}
+
+func (repo *SysMenuRepository) QueryById(ctx context.Context, id int64) (domain.SysMenu, error) {
+	daoObj, err := repo.dao.QueryById(ctx, id)
+	return repo.toDomain(daoObj), err
+}
+
+func (repo *SysMenuRepository) DeleteById(ctx context.Context, id int64) error {
+	err := repo.dao.DeleteById(ctx, id)
+	return err
+}
+
 func (repo *SysMenuRepository) toDao(obj domain.SysMenu) dao.SysMenu {
 	return dao.SysMenu{
 		MenuID:     obj.MenuID,

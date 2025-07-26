@@ -24,5 +24,11 @@ func (h *SysMenuHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/system/menu", h.AddMenu)
 		// 查询菜单列表
 		group.GET("/system/menu/list", h.QueryMenuList)
+		// 编辑菜单
+		group.PUT("/system/menu", h.UpdateMenu)
+		// 查询菜单详情
+		group.GET("/system/menu/:id", h.QueryMenuDetail)
+		// 删除菜单
+		group.DELETE("/system/menu/:id", h.DeleteMenu)
 	}
 }

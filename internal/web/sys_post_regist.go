@@ -22,10 +22,10 @@ func (h *SysPostHandler) RegistRoutes(server *gin.Engine) {
 	{
 		// 新增岗位
 		group.POST("/system/post", h.AddPost)
-		// 编辑岗位
-		group.PUT("/system/post", h.UpdatePost)
 		// 新增岗位
 		group.GET("/system/post/list", h.QueryPostList)
+		// 编辑岗位
+		group.PUT("/system/post", h.UpdatePost)
 		// 查询岗位详情
 		group.GET("/system/post/:id", h.QueryPostDetail)
 		// 删除岗位
