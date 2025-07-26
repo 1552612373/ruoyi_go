@@ -20,6 +20,11 @@ func (repo *SysMenuRepository) Create(ctx context.Context, obj domain.SysMenu) e
 	return repo.dao.Insert(ctx, repo.toDao(obj))
 }
 
+func (repo *SysMenuRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysMenu, int, error) {
+	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
+	return repo.toDomainList(daoList), total, err
+}
+
 func (repo *SysMenuRepository) toDao(obj domain.SysMenu) dao.SysMenu {
 	return dao.SysMenu{
 		MenuID:     obj.MenuID,

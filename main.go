@@ -41,6 +41,9 @@ func main() {
 	SysPostHandler := initSysPost(db)
 	SysPostHandler.RegistRoutes(server)
 
+	SysMenuHandler := initSysMenu(db)
+	SysMenuHandler.RegistRoutes(server)
+
 	for _, route := range server.Routes() {
 		log.Printf("HTTP %s --> %s\n", route.Method, route.Path)
 	}
@@ -111,7 +114,7 @@ func initWebServer() *gin.Engine {
 		},
 		MaxAge: 1222 * time.Hour,
 	}), func(ctx *gin.Context) {
-		println("这是我的 Middleware")
+		// println("这是我的 Middleware")
 	})
 	// 定义下session
 	// store := cookie.NewStore([]byte("secret")) // 基于cookie
@@ -169,5 +172,13 @@ func initSysPost(db *gorm.DB) *web.SysPostHandler {
 	myRepo := repository.NewSysPostRepository(myDao)
 	mySvc := service.NewSysPostService(myRepo)
 	myHandler := web.NewSysPostHandler(mySvc)
+	return myHandler
+}
+
+func initSysMenu(db *gorm.DB) *web.SysMenuHandler {
+	myDao := dao.NewSysMenuDAO(db)
+	myRepo := repository.NewSysMenuRepository(myDao)
+	mySvc := service.NewSysMenuService(myRepo)
+	myHandler := web.NewSysMenuHandler(mySvc)
 	return myHandler
 }

@@ -19,3 +19,7 @@ func NewSysMenuService(repo *repository.SysMenuRepository) *SysMenuService {
 func (svc *SysMenuService) Create(ctx context.Context, obj domain.SysMenu) error {
 	return svc.repo.Create(ctx, obj)
 }
+
+func (svc *SysMenuService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysMenu, int, error) {
+	return svc.repo.QueryList(ctx, pageNum, pageSize)
+}

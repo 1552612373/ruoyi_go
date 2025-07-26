@@ -92,3 +92,26 @@ func (dao *SysMenuDAO) Insert(ctx context.Context, obj SysMenu) error {
 	}
 	return err
 }
+
+func (dao *SysMenuDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysMenu, int, error) {
+	objList := []SysMenu{}
+	db := dao.db.WithContext(ctx).Model(&SysMenu{})
+
+	var total int64
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}

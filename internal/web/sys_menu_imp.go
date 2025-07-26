@@ -10,6 +10,54 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type resMenuObj struct {
+	MenuID     int64  `json:"menuId"`
+	Component  string `json:"component"`
+	CreateBy   string `json:"createBy"`
+	CreateTime string `json:"createTime"`
+	Icon       string `json:"icon"`
+	IsCache    int    `json:"isCache"`
+	IsFrame    int    `json:"isFrame"`
+	MenuName   string `json:"menuName"`
+	MenuType   string `json:"menuType"`
+	OrderNum   int    `json:"orderNum"`
+	ParentId   int64  `json:"parentId"`
+	ParentName string `json:"parentName"`
+	Path       string `json:"path"`
+	Perms      string `json:"perms"`
+	Query      string `json:"query"`
+	Remark     string `json:"remark"`
+	RouteName  string `json:"routeName"`
+	Status     string `json:"status"`
+	UpdateBy   string `json:"updateBy"`
+	UpdateTime string `json:"updateTime"`
+	Visible    string `json:"visible"`
+}
+
+func toResMenuObj(domainObj domain.SysMenu) resMenuObj {
+	return resMenuObj{
+		Component: domainObj.Component,
+		Icon:      domainObj.Icon,
+		IsCache:   domainObj.IsCache,
+		IsFrame:   domainObj.IsFrame,
+		MenuName:  domainObj.MenuName,
+		MenuType:  domainObj.MenuType,
+		OrderNum:  domainObj.OrderNum,
+		ParentId:  domainObj.ParentID,
+		// ParentName: domainObj.ParentName,
+		Perms:      domainObj.Perms,
+		Query:      domainObj.Query,
+		Remark:     domainObj.Remark,
+		RouteName:  domainObj.RouteName,
+		Status:     domainObj.Status,
+		CreateBy:   domainObj.CreateBy,
+		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+		UpdateBy:   domainObj.UpdateBy,
+		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		Visible:    domainObj.Visible,
+	}
+}
+
 // 新增字典类型
 func (h *SysMenuHandler) AddMenu(ctx *gin.Context) {
 	type addReq struct {
@@ -83,4 +131,40 @@ func (h *SysMenuHandler) AddMenu(ctx *gin.Context) {
 		"msg":  rescode.Success.String(),
 	})
 
+}
+
+// 查询菜单列表
+func (h *SysMenuHandler) QueryMenuList(ctx *gin.Context) {
+	type typeReq struct {
+		PageNum  int `json:"pageNum" form:"pageNum"`
+		PageSize int `json:"pageSize" form:"pageSize"`
+	}
+
+	var req typeReq
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	resList := []resMenuObj{}
+	for _, domainObj := range domainList {
+		resList = append(resList, toResMenuObj(domainObj))
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"total": total,
+		"data":  resList,
+	})
 }
