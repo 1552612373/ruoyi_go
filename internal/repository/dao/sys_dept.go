@@ -139,6 +139,11 @@ func (dao *SysDeptDAO) QueryByDeptId(ctx context.Context, deptId int64) (SysDept
 	return obj, err.Error
 }
 
+func (dao *SysDeptDAO) DeleteById(ctx context.Context, id int64) error {
+	err := dao.db.WithContext(ctx).Where("dept_id = ?", id).Delete(&SysDept{}).Error
+	return err
+}
+
 func (dao *SysDeptDAO) Update(ctx context.Context, obj SysDept) error {
 	err := dao.db.WithContext(ctx).Model(&obj).Where("dept_id = ?", obj.DeptID).Updates(obj).Error
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {

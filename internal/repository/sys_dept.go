@@ -35,6 +35,11 @@ func (repo *SysDeptRepository) QueryByDeptId(ctx context.Context, deptId int64) 
 	return repo.toDomain(daoObj), err
 }
 
+func (repo *SysDeptRepository) DeleteById(ctx context.Context, id int64) error {
+	err := repo.dao.DeleteById(ctx, id)
+	return err
+}
+
 func (repo *SysDeptRepository) Update(ctx context.Context, obj domain.SysDept) error {
 	return repo.dao.Update(ctx, repo.toDao(obj))
 }

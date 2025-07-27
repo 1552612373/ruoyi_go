@@ -28,6 +28,8 @@ func (h *SysDeptHandler) RegistRoutes(server *gin.Engine) {
 		group.GET("/system/dept/list", h.QueryDeptList)
 		// 查询部门列表exclude （排除节点）
 		group.GET("/system/dept/list/exclude/:deptId", h.QueryDeptListExclude)
+		// 删除部门
+		group.DELETE("/system/dept/:id", h.DeleteDept)
 		// 查询部门详情
 		group.GET("/system/dept/:deptId", h.QueryDeptDetail)
 		// 查询部门数

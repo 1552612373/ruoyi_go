@@ -33,6 +33,10 @@ func (svc *SysDeptService) QueryByDeptId(ctx context.Context, deptId int64) (dom
 	return svc.repo.QueryByDeptId(ctx, deptId)
 }
 
+func (svc *SysDeptService) DeleteByDictId(ctx context.Context, id int64) error {
+	return svc.repo.DeleteById(ctx, id)
+}
+
 func (svc *SysDeptService) Update(ctx context.Context, obj domain.SysDept) error {
 	return svc.repo.Update(ctx, obj)
 }
