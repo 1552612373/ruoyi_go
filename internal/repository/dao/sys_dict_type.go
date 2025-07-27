@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
@@ -26,13 +27,13 @@ type SysDictType struct {
 	CreateBy string `json:"createBy" gorm:"column:create_by"`
 
 	// 创建时间
-	CreateTime int64 `json:"createTime" gorm:"column:create_time"`
+	CreateTime time.Time `json:"createTime" gorm:"column:create_time"`
 
 	// 更新者
 	UpdateBy string `json:"updateBy" gorm:"column:update_by"`
 
 	// 更新时间
-	UpdateTime int64 `json:"updateTime" gorm:"column:update_time"`
+	UpdateTime time.Time `json:"updateTime" gorm:"column:update_time"`
 
 	// 备注
 	Remark string `json:"remark" gorm:"column:remark"`

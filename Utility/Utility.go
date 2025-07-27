@@ -35,22 +35,22 @@ func ThrowSysErrowIfneeded(ctx *gin.Context, err error) {
 
 var DefaultTimeFormat = "2006-01-02 15:04:05"
 
-// 13位时间戳转字符串
-func FormatTimestamp(layout string, millis int64) string {
-	if millis == 0 {
+// 时间戳转字符串
+func FormatTimestamp(layout string, times time.Time) string {
+	if times.IsZero() {
 		return ""
 	}
-	return time.UnixMilli(millis).Format(layout)
+	return time.Time(times).Format(layout)
 }
 
-// ParseToTimestamp 将指定日期时间字符串转为13位时间戳（毫秒）
-func ParseToTimestamp(layout, datetime string) int64 {
+// ParseToTimestamp 将指定日期时间字符串转时间戳
+func ParseToTimestamp(layout, datetime string) time.Time {
 	loc, _ := time.LoadLocation("Asia/Shanghai") // 设置时区
 	t, err := time.ParseInLocation(layout, datetime, loc)
 	if err != nil {
-		return 0
+		return time.Time{}
 	}
-	return t.UnixMilli()
+	return t
 }
 
 // IsChineseMobile 判断是否是国内手机号（不严格）

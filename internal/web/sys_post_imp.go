@@ -67,7 +67,7 @@ func (h *SysPostHandler) AddPost(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Create(ctx, domain.SysPost{
 		PostCode:   req.PostCode,
@@ -123,7 +123,7 @@ func (h *SysPostHandler) UpdatePost(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Update(ctx, domain.SysPost{
 		PostID: req.PostId,

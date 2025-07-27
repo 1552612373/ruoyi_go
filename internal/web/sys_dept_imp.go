@@ -40,7 +40,7 @@ func (h *SysDeptHandler) AddDept(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Create(ctx, domain.SysDept{
 		DeptName:   req.DeptName,
@@ -153,20 +153,20 @@ func (h *SysDeptHandler) QueryDeptDetail(ctx *gin.Context) {
 func (h *SysDeptHandler) UpdateDept(ctx *gin.Context) {
 
 	type deptReq struct {
-		Ancestors  string `json:"ancestors"`
-		CreateBy   string `json:"createBy"`
-		CreateTime int64  `json:"createTime"`
-		DelFlag    string `json:"delFlag" `
-		DeptId     int64  `json:"deptId"`
-		DeptName   string `json:"deptName"`
-		Email      string `json:"email"`
-		Leader     string `json:"leader"`
-		OrderNum   int    `json:"orderNum"`
-		ParentId   int64  `json:"parentId"`
-		Phone      string `json:"phone"`
-		Status     string `json:"status"`
-		UpdateBy   string `json:"updateBy"`
-		UpdateTime int64  `json:"updateTime"`
+		Ancestors  string    `json:"ancestors"`
+		CreateBy   string    `json:"createBy"`
+		CreateTime time.Time `json:"createTime"`
+		DelFlag    string    `json:"delFlag" `
+		DeptId     int64     `json:"deptId"`
+		DeptName   string    `json:"deptName"`
+		Email      string    `json:"email"`
+		Leader     string    `json:"leader"`
+		OrderNum   int       `json:"orderNum"`
+		ParentId   int64     `json:"parentId"`
+		Phone      string    `json:"phone"`
+		Status     string    `json:"status"`
+		UpdateBy   string    `json:"updateBy"`
+		UpdateTime time.Time `json:"updateTime"`
 	}
 
 	var req deptReq

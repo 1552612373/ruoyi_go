@@ -103,7 +103,7 @@ func (h *SysMenuHandler) AddMenu(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Create(ctx, domain.SysMenu{
 		Component: req.Component,
@@ -216,7 +216,7 @@ func (h *SysMenuHandler) UpdateMenu(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Update(ctx, domain.SysMenu{
 		MenuID:    req.MenuID,

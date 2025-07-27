@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type SysDept struct {
 	// 部门id
 	DeptID int64 `gorm:"column:dept_id;primaryKey;autoIncrement" json:"deptId"`
@@ -35,11 +37,11 @@ type SysDept struct {
 	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
 	// 创建时间（时间戳）
-	CreateTime int64 `gorm:"column:create_time" json:"createTime"`
+	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 
 	// 更新者
 	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
 	// 更新时间（时间戳）
-	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
+	UpdateTime time.Time `gorm:"column:update_time" json:"updateTime"`
 }

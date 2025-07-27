@@ -71,7 +71,7 @@ func (h *SysDictDataHandler) AddDictData(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Create(ctx, domain.SysDictData{
 		DictLabel:  req.DictLabel,
@@ -252,7 +252,7 @@ func (h *SysDictDataHandler) UpdateDictData(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Update(ctx, domain.SysDictData{
 		DictCode:  req.DictCode,

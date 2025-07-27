@@ -50,22 +50,22 @@ type SysUser struct {
 	LoginIP string `gorm:"column:login_ip" json:"loginIp"`
 
 	// 最后登录时间（时间戳）
-	LoginDate int64 `gorm:"column:login_date" json:"loginDate"`
+	LoginDate time.Time `gorm:"column:login_date" json:"loginDate"`
 
 	// 密码最后更新时间（时间戳）
-	PwdUpdateDate int64 `gorm:"column:pwd_update_date" json:"pwdUpdateDate"`
+	PwdUpdateDate time.Time `gorm:"column:pwd_update_date" json:"pwdUpdateDate"`
 
 	// 创建者
 	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
 	// 创建时间（时间戳）
-	CreateTime int64 `gorm:"column:create_time" json:"createTime"`
+	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 
 	// 更新者
 	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
 	// 更新时间（时间戳）
-	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
+	UpdateTime time.Time `gorm:"column:update_time" json:"updateTime"`
 
 	// 备注
 	Remark *string `gorm:"column:remark" json:"remark"`
@@ -82,7 +82,7 @@ func NewSysUserDAO(db *gorm.DB) *SysUserDAO {
 }
 
 func (dao *SysUserDAO) Insert(ctx context.Context, obj SysUser) error {
-	now := time.Now().UnixMilli()
+	now := time.Now()
 	obj.UpdateTime = now
 	obj.CreateTime = now
 	err := dao.db.WithContext(ctx).Create(&obj).Error

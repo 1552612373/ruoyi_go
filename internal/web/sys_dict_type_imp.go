@@ -70,7 +70,7 @@ func (h *SysDictTypeHandler) AddDictType(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Create(ctx, domain.SysDictType{
 		DictName:   req.DictName,
@@ -126,7 +126,7 @@ func (h *SysDictTypeHandler) UpdateType(ctx *gin.Context) {
 			"msg":  rescode.ErrUserUnauthorized.String(),
 		})
 	}
-	now := time.Now().UnixMilli()
+	now := time.Now()
 
 	err := h.svc.Update(ctx, domain.SysDictType{
 		DictId:     req.DictId,

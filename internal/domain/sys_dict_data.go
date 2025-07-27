@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type SysDictData struct {
 	// 字典编码
 	DictCode int64 `gorm:"column:dict_code;primaryKey;autoIncrement" json:"dictCode"`
@@ -32,13 +34,13 @@ type SysDictData struct {
 	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
 	// 创建时间（时间戳）
-	CreateTime int64 `gorm:"column:create_time" json:"createTime"`
+	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
 
 	// 更新者
 	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
 	// 更新时间（时间戳）
-	UpdateTime int64 `gorm:"column:update_time" json:"updateTime"`
+	UpdateTime time.Time `gorm:"column:update_time" json:"updateTime"`
 
 	// 备注
 	Remark *string `gorm:"column:remark" json:"remark"`
