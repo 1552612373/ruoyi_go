@@ -24,8 +24,8 @@ func (h *SysRoleHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/system/role", h.AddRole)
 		// 角色列表
 		group.GET("/system/role/list", h.QueryRoleList)
-		// // 编辑角色
-		// group.PUT("/system/role", h.UpdateRole)
+		// 编辑角色
+		group.PUT("/system/role", h.UpdateRole)
 		// 查询角色详情
 		group.GET("/system/role/:id", h.QueryRoleDetail)
 		// 删除角色

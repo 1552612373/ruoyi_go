@@ -25,8 +25,8 @@ func (svc *SysRoleService) QueryList(ctx context.Context, pageNum int, pageSize 
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
 }
 
-func (svc *SysRoleService) Update(ctx context.Context, obj domain.SysRole) error {
-	return svc.repo.Update(ctx, obj)
+func (svc *SysRoleService) Update(ctx context.Context, obj domain.SysRole, menuIds []int64) error {
+	return svc.repo.Update(ctx, obj, menuIds)
 }
 
 func (svc *SysRoleService) QueryById(ctx context.Context, id int64) (domain.SysRole, error) {

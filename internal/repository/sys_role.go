@@ -25,8 +25,8 @@ func (repo *SysRoleRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
-func (repo *SysRoleRepository) Update(ctx context.Context, obj domain.SysRole) error {
-	return repo.dao.Update(ctx, repo.toDao(obj))
+func (repo *SysRoleRepository) Update(ctx context.Context, obj domain.SysRole, menuIds []int64) error {
+	return repo.dao.Update(ctx, repo.toDao(obj), menuIds)
 }
 
 func (repo *SysRoleRepository) QueryById(ctx context.Context, id int64) (domain.SysRole, error) {

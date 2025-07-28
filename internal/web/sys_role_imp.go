@@ -113,65 +113,81 @@ func (h *SysRoleHandler) AddRole(ctx *gin.Context) {
 
 }
 
-// // 编辑角色
-// func (h *SysRoleHandler) UpdatePost(ctx *gin.Context) {
-// 	type addReq struct {
-// 		PostId     int64  `json:"postId" binding:"required"`
-// 		CreateBy   string `json:"createBy"`
-// 		CreateTime string `json:"createTime"`
-// 		Flag       bool   `json:"flag"`
-// 		PostCode   string `json:"postCode"`
-// 		PostName   string `json:"postName"`
-// 		PostSort   int32  `json:"postSort"`
-// 		Remark     string `json:"remark"`
-// 		Status     string `json:"status"`
-// 		UpdateBy   string `json:"updateBy"`
-// 		UpdateTime string `json:"updateTime"`
-// 	}
+// 编辑角色
+func (h *SysRoleHandler) UpdateRole(ctx *gin.Context) {
+	type updateReq struct {
+		RoleId            int64   `json:"roleId"`
+		RoleName          string  `json:"roleName"`
+		RoleKey           string  `json:"roleKey"`
+		RoleSort          int     `json:"roleSort"`
+		DataScope         string  `json:"dataScope"`
+		MenuCheckStrictly int     `json:"menuCheckStrictly"`
+		DeptCheckStrictly int     `json:"deptCheckStrictly"`
+		Flag              int     `json:"flag"`
+		Admin             int     `json:"admin"`
+		Remark            string  `json:"remark"`
+		Status            string  `json:"status"`
+		DelFlag           string  `json:"delFlag"`
+		MenuIds           []int64 `json:"menuIds"`
+		DeptIds           []int64 `json:"deptIds"`
+		Permissions       string  `json:"permissions"`
+		UpdateBy          string  `json:"updateBy"`
+		UpdateTime        string  `json:"updateTime"`
+		CreateBy          string  `json:"createBy"`
+		CreateTime        string  `json:"createTime"`
+	}
 
-// 	var req addReq
+	var req updateReq
 
-// 	if err := ctx.ShouldBindJSON(&req); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"code": rescode.ErrInvalidParam,
-// 			"msg":  rescode.ErrInvalidParam.String(),
-// 		})
-// 		return
-// 	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
 
-// 	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
-// 	if !ok {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"code": rescode.ErrUserUnauthorized,
-// 			"msg":  rescode.ErrUserUnauthorized.String(),
-// 		})
-// 	}
-// 	now := time.Now()
+	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrUserUnauthorized,
+			"msg":  rescode.ErrUserUnauthorized.String(),
+		})
+	}
+	now := time.Now()
 
-// 	err := h.svc.Update(ctx, domain.SysRole{
-// 		PostID: req.PostId,
-// 		// Flag:       req.Flag,
-// 		PostCode:   req.PostCode,
-// 		PostName:   req.PostName,
-// 		PostSort:   req.PostSort,
-// 		Remark:     &req.Remark,
-// 		Status:     req.Status,
-// 		UpdateBy:   claimsObj.UserName,
-// 		UpdateTime: now,
-// 		CreateBy:   claimsObj.UserName,
-// 		CreateTime: now,
-// 	})
-// 	if err != nil {
-// 		utility.ThrowSysErrowIfneeded(ctx, err)
-// 		return
-// 	}
+	err := h.svc.Update(ctx, domain.SysRole{
+		RoleId:            req.RoleId,
+		RoleName:          req.RoleName,
+		RoleKey:           req.RoleKey,
+		RoleSort:          req.RoleSort,
+		DataScope:         req.DataScope,
+		MenuCheckStrictly: req.MenuCheckStrictly,
+		DeptCheckStrictly: req.DeptCheckStrictly,
+		// Flag:              req.Flag,
+		// Admin:             req.Admin,
+		Remark:  req.Remark,
+		Status:  req.Status,
+		DelFlag: req.DelFlag,
+		// MenuIds:           req.MenuIds,
+		// DeptIds:           req.DeptIds,
+		// Permissions:       req.Permissions,
+		UpdateBy:   claimsObj.UserName,
+		UpdateTime: now,
+		CreateBy:   claimsObj.UserName,
+		CreateTime: now,
+	}, req.MenuIds)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code": rescode.Success,
-// 		"msg":  rescode.Success.String(),
-// 	})
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
 
-// }
+}
 
 // 查询角色列表
 func (h *SysRoleHandler) QueryRoleList(ctx *gin.Context) {

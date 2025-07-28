@@ -123,7 +123,7 @@ func (dao *SysRoleDAO) Insert(ctx context.Context, obj SysRole, menuIds []int64,
 			return err
 		}
 	}
-	return err
+	return tx.Commit().Error
 }
 
 func (dao *SysRoleDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysRole, int, error) {
@@ -149,16 +149,48 @@ func (dao *SysRoleDAO) QueryList(ctx context.Context, pageNum int, pageSize int)
 	return objList, int(total), err
 }
 
-func (dao *SysRoleDAO) Update(ctx context.Context, obj SysRole) error {
-	err := dao.db.WithContext(ctx).Model(&obj).Where("role_id = ?", obj.RoleId).Updates(obj).Error
+func (dao *SysRoleDAO) Update(ctx context.Context, obj SysRole, menuIds []int64) error {
+	// 开启事务
+	tx := dao.db.WithContext(ctx).Begin()
+	// “延迟执行 + panic 捕获” 机制，用于在发生 panic 时，自动回滚事务，防止数据不一致
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err := tx.Model(&obj).Where("role_id = ?", obj.RoleId).Updates(obj).Error
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		const uniqueConflictsErrNo uint16 = 1062
 		if mysqlErr.Number == uniqueConflictsErrNo {
 			// 唯一键冲突
+			tx.Rollback()
 			return errors.New("ZT唯一键冲突")
 		}
 	}
-	return err
+
+	// 如果有菜单，则插入关系表
+	if len(menuIds) > 0 {
+		// 删旧数据
+		if err := tx.Where("role_id = ?", obj.RoleId).Delete(&SysRoleMenu{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		var roleMenus []SysRoleMenu
+		for _, menuId := range menuIds {
+			roleMenus = append(roleMenus, SysRoleMenu{
+				RoleId: obj.RoleId,
+				MenuId: menuId,
+			})
+		}
+		if err := tx.Create(&roleMenus).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
 }
 
 func (dao *SysRoleDAO) QueryById(ctx context.Context, id int64) (SysRole, error) {
