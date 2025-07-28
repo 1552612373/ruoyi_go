@@ -55,3 +55,11 @@ func (svc *SysUserService) QueryList(ctx context.Context, pageNum int, pageSize 
 func (svc *SysUserService) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
 	return svc.repo.GetSystemUserBase(ctx)
 }
+
+func (svc *SysUserService) QueryById(ctx context.Context, id int64) (domain.SysUser, error) {
+	return svc.repo.QueryById(ctx, id)
+}
+
+func (svc *SysUserService) DeleteById(ctx context.Context, id int64) error {
+	return svc.repo.DeleteById(ctx, id)
+}

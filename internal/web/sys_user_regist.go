@@ -32,6 +32,11 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 		// 查看通用系统用户：岗位post列表和角色role列表
 		group.GET("/system/user/", h.GetSystemUserBase)
 
+		// 查询用户详情
+		group.GET("/system/user/:id", h.QueryUserDetail)
+		// 用户角色
+		group.DELETE("/system/user/:id", h.DeleteUser)
+
 		group.GET("/system/config/configKey/sys.user.initPassword", h.DefaultPassword)
 
 		// 临时

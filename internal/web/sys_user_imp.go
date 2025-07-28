@@ -5,6 +5,7 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -439,4 +440,57 @@ func (h *SysUserHandler) GetSystemUserBase(ctx *gin.Context) {
 		"posts": postObjList,
 		"roles": roleObjList,
 	})
+}
+
+// 查询用户详情
+func (h *SysUserHandler) QueryUserDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainObj, err := h.svc.QueryById(ctx, id)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": toResUserObj(domainObj),
+	})
+}
+
+// 删除用户
+func (h *SysUserHandler) DeleteUser(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	errx := h.svc.DeleteById(ctx, id)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, errx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+
 }

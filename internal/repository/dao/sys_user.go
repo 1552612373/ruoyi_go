@@ -202,3 +202,37 @@ func (dao *SysUserDAO) GetSystemUserBase(ctx context.Context) ([]SysPost, []SysR
 	}
 	return postObjList, roleObjList, nil
 }
+
+func (dao *SysUserDAO) QueryById(ctx context.Context, id int64) (SysUser, error) {
+	obj := SysUser{}
+	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&obj)
+	return obj, err.Error
+}
+
+func (dao *SysUserDAO) DeleteById(ctx context.Context, id int64) error {
+	// 开启事务
+	tx := dao.db.WithContext(ctx).Begin()
+	// “延迟执行 + panic 捕获” 机制，用于在发生 panic 时，自动回滚事务，防止数据不一致
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	// 先删角色
+	err := dao.db.WithContext(ctx).Where("user_id = ?", id).Delete(&SysUser{}).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	// 再删关系表
+	if err := tx.Where("user_id = ?", id).Delete(&SysUserPost{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Where("user_id = ?", id).Delete(&SysUserRole{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	// 提交事务
+	return tx.Commit().Error
+}

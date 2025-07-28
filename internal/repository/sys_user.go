@@ -37,6 +37,16 @@ func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
+func (repo *SysUserRepository) QueryById(ctx context.Context, id int64) (domain.SysUser, error) {
+	daoObj, err := repo.dao.QueryById(ctx, id)
+	return repo.toDomain(daoObj), err
+}
+
+func (repo *SysUserRepository) DeleteById(ctx context.Context, id int64) error {
+	err := repo.dao.DeleteById(ctx, id)
+	return err
+}
+
 // 查看通用系统用户：岗位post列表和角色role列表
 func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
 	return repo.dao.GetSystemUserBase(ctx)
