@@ -139,7 +139,11 @@ func initWebServer() *gin.Engine {
 }
 
 func initSysUser(db *gorm.DB) *web.SysUserHandler {
-	myDao := dao.NewSysUserDAO(db)
+	postDao := dao.NewSysPostDAO(db)
+	menuDao := dao.NewSysMenuDAO(db)
+	roleDao := dao.NewSysRoleDAO(db, menuDao)
+
+	myDao := dao.NewSysUserDAO(db, postDao, roleDao)
 	myRepo := repository.NewSysUserRepository(myDao)
 	mySvc := service.NewSysUserService(myRepo)
 	myHandler := web.NewSysUserHandler(mySvc)

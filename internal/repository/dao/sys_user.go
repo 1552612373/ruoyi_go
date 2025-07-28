@@ -72,12 +72,16 @@ type SysUser struct {
 }
 
 type SysUserDAO struct {
-	db *gorm.DB
+	db      *gorm.DB
+	postDao *SysPostDAO
+	roleDao *SysRoleDAO
 }
 
-func NewSysUserDAO(db *gorm.DB) *SysUserDAO {
+func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO) *SysUserDAO {
 	return &SysUserDAO{
-		db: db,
+		db:      db,
+		postDao: postDao,
+		roleDao: roleDao,
 	}
 }
 
@@ -129,4 +133,17 @@ func (dao *SysUserDAO) QueryList(ctx context.Context, pageNum int, pageSize int)
 	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
 
 	return objList, int(total), err
+}
+
+// 查看通用系统用户：岗位post列表和角色role列表
+func (dao *SysUserDAO) GetSystemUserBase(ctx context.Context) ([]SysPost, []SysRole, error) {
+	postObjList, _, err := dao.postDao.QueryList(ctx, 1, 99)
+	if err != nil {
+		return []SysPost{}, []SysRole{}, err
+	}
+	roleObjList, _, err := dao.roleDao.QueryList(ctx, 1, 99)
+	if err != nil {
+		return []SysPost{}, []SysRole{}, err
+	}
+	return postObjList, roleObjList, nil
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go_ruoyi_base/internal/domain"
 	"go_ruoyi_base/internal/repository"
+	"go_ruoyi_base/internal/repository/dao"
 
 	"gorm.io/gorm"
 )
@@ -48,4 +49,9 @@ func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUse
 
 func (svc *SysUserService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
 	return svc.repo.QueryList(ctx, pageNum, pageSize)
+}
+
+// 查看通用系统用户：岗位post列表和角色role列表
+func (svc *SysUserService) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
+	return svc.repo.GetSystemUserBase(ctx)
 }

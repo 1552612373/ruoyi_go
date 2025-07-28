@@ -390,3 +390,19 @@ func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
 		"rows":  resList,
 	})
 }
+
+// 查看通用系统用户：岗位post列表和角色role列表
+func (h *SysUserHandler) GetSystemUserBase(ctx *gin.Context) {
+	postObjList, roleObjList, err := h.svc.GetSystemUserBase(ctx)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"posts": postObjList,
+		"roles": roleObjList,
+	})
+}

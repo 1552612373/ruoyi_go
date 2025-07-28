@@ -37,6 +37,11 @@ func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
+// 查看通用系统用户：岗位post列表和角色role列表
+func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
+	return repo.dao.GetSystemUserBase(ctx)
+}
+
 func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	return dao.SysUser{
 		UserID:        obj.UserID,
