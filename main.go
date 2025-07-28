@@ -44,6 +44,9 @@ func main() {
 	SysMenuHandler := initSysMenu(db)
 	SysMenuHandler.RegistRoutes(server)
 
+	SysRoleHandler := initSysRole(db)
+	SysRoleHandler.RegistRoutes(server)
+
 	for _, route := range server.Routes() {
 		log.Printf("HTTP %s --> %s\n", route.Method, route.Path)
 	}
@@ -180,5 +183,13 @@ func initSysMenu(db *gorm.DB) *web.SysMenuHandler {
 	myRepo := repository.NewSysMenuRepository(myDao)
 	mySvc := service.NewSysMenuService(myRepo)
 	myHandler := web.NewSysMenuHandler(mySvc)
+	return myHandler
+}
+
+func initSysRole(db *gorm.DB) *web.SysRoleHandler {
+	myDao := dao.NewSysRoleDAO(db)
+	myRepo := repository.NewSysRoleRepository(myDao)
+	mySvc := service.NewSysRoleService(myRepo)
+	myHandler := web.NewSysRoleHandler(mySvc)
 	return myHandler
 }

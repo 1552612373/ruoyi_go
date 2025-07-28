@@ -22,13 +22,13 @@ func (h *SysRoleHandler) RegistRoutes(server *gin.Engine) {
 	{
 		// 新增角色
 		group.POST("/system/role", h.AddRole)
-		// // 角色列表
-		// group.GET("/system/role/list", h.QueryRoleList)
+		// 角色列表
+		group.GET("/system/role/list", h.QueryRoleList)
 		// // 编辑角色
 		// group.PUT("/system/role", h.UpdateRole)
-		// // 查询角色详情
-		// group.GET("/system/role/:id", h.QueryRoleDetail)
-		// // 删除角色
-		// group.DELETE("/system/role/:id", h.DeleteRole)
+		// 查询角色详情
+		group.GET("/system/role/:id", h.QueryRoleDetail)
+		// 删除角色
+		group.DELETE("/system/role/:id", h.DeleteRole)
 	}
 }

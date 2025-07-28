@@ -5,6 +5,7 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -172,91 +173,91 @@ func (h *SysRoleHandler) AddRole(ctx *gin.Context) {
 
 // }
 
-// // 查询角色列表
-// func (h *SysRoleHandler) QueryPostList(ctx *gin.Context) {
-// 	type typeReq struct {
-// 		PageNum  int `json:"pageNum" form:"pageNum"`
-// 		PageSize int `json:"pageSize" form:"pageSize"`
-// 	}
+// 查询角色列表
+func (h *SysRoleHandler) QueryRoleList(ctx *gin.Context) {
+	type typeReq struct {
+		PageNum  int `json:"pageNum" form:"pageNum"`
+		PageSize int `json:"pageSize" form:"pageSize"`
+	}
 
-// 	var req typeReq
+	var req typeReq
 
-// 	if err := ctx.ShouldBindQuery(&req); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"code": rescode.ErrInvalidParam,
-// 			"msg":  rescode.ErrInvalidParam.String(),
-// 		})
-// 		return
-// 	}
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
 
-// 	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
-// 	if err != nil {
-// 		utility.ThrowSysErrowIfneeded(ctx, err)
-// 		return
-// 	}
+	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-// 	resList := []resRoleObj{}
-// 	for _, domainObj := range domainList {
-// 		resList = append(resList, toResRoleObj(domainObj))
-// 	}
+	resList := []resRoleObj{}
+	for _, domainObj := range domainList {
+		resList = append(resList, toResRoleObj(domainObj))
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code":  rescode.Success,
-// 		"msg":   rescode.Success.String(),
-// 		"total": total,
-// 		"rows":  resList,
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"total": total,
+		"rows":  resList,
+	})
+}
 
-// // 查询角色详情
-// func (h *SysRoleHandler) QueryPostDetail(ctx *gin.Context) {
-// 	// 获取路径参数 id
-// 	idStr := ctx.Param("id")
-// 	id, err := strconv.ParseInt(idStr, 10, 64)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"code": rescode.ErrInvalidParam,
-// 			"msg":  "无效的字典类型ID",
-// 		})
-// 		return
-// 	}
+// 查询角色详情
+func (h *SysRoleHandler) QueryRoleDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
 
-// 	domainObj, err := h.svc.QueryById(ctx, id)
+	domainObj, err := h.svc.QueryById(ctx, id)
 
-// 	if err != nil {
-// 		utility.ThrowSysErrowIfneeded(ctx, err)
-// 		return
-// 	}
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code": rescode.Success,
-// 		"msg":  rescode.Success.String(),
-// 		"data": toResRoleObj(domainObj),
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		"data": toResRoleObj(domainObj),
+	})
+}
 
-// // 删除角色
-// func (h *SysRoleHandler) DeletePost(ctx *gin.Context) {
-// 	// 获取路径参数 id
-// 	idStr := ctx.Param("id")
-// 	id, err := strconv.ParseInt(idStr, 10, 64)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"code": rescode.ErrInvalidParam,
-// 			"msg":  "无效的字典类型ID",
-// 		})
-// 		return
-// 	}
+// 删除角色
+func (h *SysRoleHandler) DeleteRole(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
 
-// 	errx := h.svc.DeleteByDictId(ctx, id)
-// 	if errx != nil {
-// 		utility.ThrowSysErrowIfneeded(ctx, errx)
-// 		return
-// 	}
+	errx := h.svc.DeleteByDictId(ctx, id)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, errx)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code": rescode.Success,
-// 		"msg":  rescode.Success.String(),
-// 	})
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
 
-// }
+}
