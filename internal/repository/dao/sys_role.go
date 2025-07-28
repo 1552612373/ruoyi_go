@@ -54,23 +54,25 @@ type SysRole struct {
 	Remark string `json:"remark" gorm:"column:remark"`
 }
 
-type RoleMenu struct {
+type SysRoleMenu struct {
 	RoleId int64 `gorm:"primaryKey"`
 	MenuId int64 `gorm:"primaryKey"`
 }
 
-type RoleDept struct {
+type SysRoleDept struct {
 	RoleId int64 `gorm:"primaryKey"`
 	DeptId int64 `gorm:"primaryKey"`
 }
 
 type SysRoleDAO struct {
-	db *gorm.DB
+	db      *gorm.DB
+	menuDao *SysMenuDAO
 }
 
-func NewSysRoleDAO(db *gorm.DB) *SysRoleDAO {
+func NewSysRoleDAO(db *gorm.DB, menuDao *SysMenuDAO) *SysRoleDAO {
 	return &SysRoleDAO{
-		db: db,
+		db:      db,
+		menuDao: menuDao,
 	}
 }
 
@@ -95,9 +97,9 @@ func (dao *SysRoleDAO) Insert(ctx context.Context, obj SysRole, menuIds []int64,
 	}
 	// 如果有菜单，则插入关系表
 	if len(menuIds) > 0 {
-		var roleMenus []RoleMenu
+		var roleMenus []SysRoleMenu
 		for _, menuId := range menuIds {
-			roleMenus = append(roleMenus, RoleMenu{
+			roleMenus = append(roleMenus, SysRoleMenu{
 				RoleId: obj.RoleId,
 				MenuId: menuId,
 			})
@@ -109,9 +111,9 @@ func (dao *SysRoleDAO) Insert(ctx context.Context, obj SysRole, menuIds []int64,
 	}
 	// 如果有部门，则插入关系表
 	if len(deptIds) > 0 {
-		var roleDepts []RoleDept
+		var roleDepts []SysRoleDept
 		for _, deptId := range deptIds {
-			roleDepts = append(roleDepts, RoleDept{
+			roleDepts = append(roleDepts, SysRoleDept{
 				RoleId: obj.RoleId,
 				DeptId: deptId,
 			})
@@ -181,14 +183,37 @@ func (dao *SysRoleDAO) DeleteById(ctx context.Context, id int64) error {
 		return err
 	}
 	// 再删关系表
-	if err := tx.Where("role_id = ?", id).Delete(&RoleMenu{}).Error; err != nil {
+	if err := tx.Where("role_id = ?", id).Delete(&SysRoleMenu{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
-	if err := tx.Where("role_id = ?", id).Delete(&RoleDept{}).Error; err != nil {
+	if err := tx.Where("role_id = ?", id).Delete(&SysRoleDept{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 	// 提交事务
 	return tx.Commit().Error
+}
+
+// 角色菜单树
+func (dao *SysRoleDAO) QueryRoleMenuTreeById(ctx context.Context, id int64) ([]*MenuTreeNode, []int64, error) {
+	// 所有菜单树形结构
+	tree, err := dao.menuDao.GetMenuTree(ctx)
+	if err != nil {
+		return []*MenuTreeNode{}, []int64{}, err
+	}
+
+	// 角色菜单关系表
+	var roleMenus []SysRoleMenu
+	errx := dao.db.Where("role_id = ?", id).Find(&roleMenus).Error
+	if errx != nil {
+		return []*MenuTreeNode{}, []int64{}, err
+	}
+	var ids []int64
+	for _, rel := range roleMenus {
+		ids = append(ids, rel.MenuId)
+	}
+
+	return tree, ids, nil
+
 }

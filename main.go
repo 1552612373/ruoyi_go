@@ -187,7 +187,9 @@ func initSysMenu(db *gorm.DB) *web.SysMenuHandler {
 }
 
 func initSysRole(db *gorm.DB) *web.SysRoleHandler {
-	myDao := dao.NewSysRoleDAO(db)
+	menuDao := dao.NewSysMenuDAO(db)
+
+	myDao := dao.NewSysRoleDAO(db, menuDao)
 	myRepo := repository.NewSysRoleRepository(myDao)
 	mySvc := service.NewSysRoleService(myRepo)
 	myHandler := web.NewSysRoleHandler(mySvc)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"go_ruoyi_base/internal/domain"
 	"go_ruoyi_base/internal/repository"
+	"go_ruoyi_base/internal/repository/dao"
 )
 
 type SysRoleService struct {
@@ -34,4 +35,9 @@ func (svc *SysRoleService) QueryById(ctx context.Context, id int64) (domain.SysR
 
 func (svc *SysRoleService) DeleteByDictId(ctx context.Context, id int64) error {
 	return svc.repo.DeleteById(ctx, id)
+}
+
+func (svc *SysRoleService) QueryRoleMenuTreeById(ctx context.Context, id int64) ([]*dao.MenuTreeNode, []int64, error) {
+	tree, keys, err := svc.repo.QueryRoleMenuTreeById(ctx, id)
+	return tree, keys, err
 }

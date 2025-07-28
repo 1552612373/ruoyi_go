@@ -275,15 +275,17 @@ func (h *SysRoleHandler) QueryRoleMenuTree(ctx *gin.Context) {
 		return
 	}
 
-	// errx := h.svc.DeleteByDictId(ctx, id)
-	// if errx != nil {
-	// 	utility.ThrowSysErrowIfneeded(ctx, errx)
-	// 	return
-	// }
+	tree, keys, err := h.svc.QueryRoleMenuTreeById(ctx, id)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code": rescode.Success,
-	// 	"msg":  rescode.Success.String(),
-	// })
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":        rescode.Success,
+		"msg":         rescode.Success.String(),
+		"checkedKeys": keys,
+		"menus":       tree,
+	})
 
 }

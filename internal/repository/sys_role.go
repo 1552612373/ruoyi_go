@@ -39,6 +39,11 @@ func (repo *SysRoleRepository) DeleteById(ctx context.Context, id int64) error {
 	return err
 }
 
+func (repo *SysRoleRepository) QueryRoleMenuTreeById(ctx context.Context, id int64) ([]*dao.MenuTreeNode, []int64, error) {
+	tree, keys, err := repo.dao.QueryRoleMenuTreeById(ctx, id)
+	return tree, keys, err
+}
+
 func (repo *SysRoleRepository) toDao(obj domain.SysRole) dao.SysRole {
 	return dao.SysRole{
 		RoleId:            obj.RoleId,
