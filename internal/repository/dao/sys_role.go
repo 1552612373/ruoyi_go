@@ -1,6 +1,13 @@
 package dao
 
-import "time"
+import (
+	"context"
+	"errors"
+	"time"
+
+	"github.com/go-sql-driver/mysql"
+	"gorm.io/gorm"
+)
 
 // SysRole 角色信息表(sys_role)
 type SysRole struct {
@@ -45,4 +52,120 @@ type SysRole struct {
 
 	// 备注信息（可选）
 	Remark string `json:"remark" gorm:"column:remark"`
+}
+
+type RoleMenu struct {
+	RoleId int64 `gorm:"primaryKey"`
+	MenuId int64 `gorm:"primaryKey"`
+}
+
+type RoleDept struct {
+	RoleId int64 `gorm:"primaryKey"`
+	DeptId int64 `gorm:"primaryKey"`
+}
+
+type SysRoleDAO struct {
+	db *gorm.DB
+}
+
+func NewSysRoleDAO(db *gorm.DB) *SysRoleDAO {
+	return &SysRoleDAO{
+		db: db,
+	}
+}
+
+func (dao *SysRoleDAO) Insert(ctx context.Context, obj SysRole, menuIds []int64, deptIds []int64) error {
+	// 开启事务
+	tx := dao.db.WithContext(ctx).Begin()
+	// “延迟执行 + panic 捕获” 机制，用于在发生 panic 时，自动回滚事务，防止数据不一致
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	// 先插入角色表
+	err := dao.db.WithContext(ctx).Create(&obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			tx.Rollback()
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	// 如果有菜单，则插入关系表
+	if len(menuIds) > 0 {
+		var roleMenus []RoleMenu
+		for _, menuId := range menuIds {
+			roleMenus = append(roleMenus, RoleMenu{
+				RoleId: obj.RoleId,
+				MenuId: menuId,
+			})
+		}
+		if err := tx.Create(&roleMenus).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	// 如果有部门，则插入关系表
+	if len(deptIds) > 0 {
+		var roleDepts []RoleDept
+		for _, deptId := range deptIds {
+			roleDepts = append(roleDepts, RoleDept{
+				RoleId: obj.RoleId,
+				DeptId: deptId,
+			})
+		}
+		if err := tx.Create(&roleDepts).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return err
+}
+
+func (dao *SysRoleDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysRole, int, error) {
+	objList := []SysRole{}
+	db := dao.db.WithContext(ctx).Model(&SysRole{})
+
+	var total int64
+
+	// 查询总数
+	db.Count(&total)
+
+	// 分页处理
+	if pageNum <= 0 {
+		pageNum = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 执行分页查询
+	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+
+	return objList, int(total), err
+}
+
+func (dao *SysRoleDAO) Update(ctx context.Context, obj SysRole) error {
+	err := dao.db.WithContext(ctx).Model(&obj).Where("role_id = ?", obj.RoleId).Updates(obj).Error
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 唯一键冲突
+			return errors.New("ZT唯一键冲突")
+		}
+	}
+	return err
+}
+
+func (dao *SysRoleDAO) QueryById(ctx context.Context, id int64) (SysRole, error) {
+	obj := SysRole{}
+	err := dao.db.WithContext(ctx).Where("role_id = ?", id).First(&obj)
+	return obj, err.Error
+}
+
+func (dao *SysRoleDAO) DeleteById(ctx context.Context, id int64) error {
+	err := dao.db.WithContext(ctx).Where("role_id = ?", id).Delete(&SysRole{}).Error
+	return err
 }

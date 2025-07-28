@@ -27,6 +27,8 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 
 		// 查询用户列表
 		group.GET("/system/user/list", h.QueryUserList)
+		// 查看通用系统用户：岗位post列表和角色role列表
+		// group.GET("/system/user/", h.GetSystemUser)
 
 		// 临时
 		group.GET("/getRouters", h.GetRouters)
