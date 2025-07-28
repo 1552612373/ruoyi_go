@@ -53,6 +53,14 @@ func ParseToTimestamp(layout, datetime string) time.Time {
 	return t
 }
 
+// 指针类型的time
+func FormatTimePtr(layout string, t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	return FormatTimestamp(layout, *t)
+}
+
 // IsChineseMobile 判断是否是国内手机号（不严格）
 func IsChineseMobile(mobile string) bool {
 	// 匹配 11 位手机号，以 13、14、15、17、18、19 开头

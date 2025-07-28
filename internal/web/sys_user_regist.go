@@ -25,6 +25,8 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 		group.POST("/logout", h.Logout)
 		group.GET("/getInfo", h.GetInfo)
 
+		// 新增用户
+		group.POST("/system/user", h.Signup)
 		// 查询用户列表
 		group.GET("/system/user/list", h.QueryUserList)
 		// 查看通用系统用户：岗位post列表和角色role列表

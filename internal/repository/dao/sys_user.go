@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -11,7 +12,8 @@ import (
 
 type SysUser struct {
 	// 用户ID
-	UserID int64 `gorm:"column:user_id;primaryKey;autoIncrement" json:"userId"`
+	// UserID int64 `gorm:"column:user_id;primaryKey;autoIncrement" json:"userId"`
+	ID int64 `gorm:"column:user_id;primaryKey;autoIncrement" json:"userId"`
 
 	// 部门ID
 	DeptID *int64 `gorm:"column:dept_id" json:"deptId"`
@@ -50,25 +52,35 @@ type SysUser struct {
 	LoginIP string `gorm:"column:login_ip" json:"loginIp"`
 
 	// 最后登录时间（时间戳）
-	LoginDate time.Time `gorm:"column:login_date" json:"loginDate"`
+	LoginDate *time.Time `gorm:"column:login_date" json:"loginDate"`
 
 	// 密码最后更新时间（时间戳）
-	PwdUpdateDate time.Time `gorm:"column:pwd_update_date" json:"pwdUpdateDate"`
+	PwdUpdateDate *time.Time `gorm:"column:pwd_update_date" json:"pwdUpdateDate"`
 
 	// 创建者
 	CreateBy string `gorm:"column:create_by" json:"createBy"`
 
 	// 创建时间（时间戳）
-	CreateTime time.Time `gorm:"column:create_time" json:"createTime"`
+	CreateTime *time.Time `gorm:"column:create_time" json:"createTime"`
 
 	// 更新者
 	UpdateBy string `gorm:"column:update_by" json:"updateBy"`
 
 	// 更新时间（时间戳）
-	UpdateTime time.Time `gorm:"column:update_time" json:"updateTime"`
+	UpdateTime *time.Time `gorm:"column:update_time" json:"updateTime"`
 
 	// 备注
 	Remark *string `gorm:"column:remark" json:"remark"`
+}
+
+type SysUserPost struct {
+	UserId int64 `gorm:"primaryKey"`
+	PostId int64 `gorm:"primaryKey"`
+}
+
+type SysUserRole struct {
+	UserId int64 `gorm:"primaryKey"`
+	RoleId int64 `gorm:"primaryKey"`
 }
 
 type SysUserDAO struct {
@@ -85,19 +97,62 @@ func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO) *SysUs
 	}
 }
 
-func (dao *SysUserDAO) Insert(ctx context.Context, obj SysUser) error {
+func (dao *SysUserDAO) Insert(ctx context.Context, obj SysUser, postIds []int64, roleIds []int64) error {
+	// 开启事务
+	tx := dao.db.WithContext(ctx).Begin()
+	// “延迟执行 + panic 捕获” 机制，用于在发生 panic 时，自动回滚事务，防止数据不一致
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	// 先插入
 	now := time.Now()
-	obj.UpdateTime = now
-	obj.CreateTime = now
-	err := dao.db.WithContext(ctx).Create(&obj).Error
+	obj.UpdateTime = &now
+	obj.CreateTime = &now
+	err := tx.Create(&obj).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		const uniqueConflictsErrNo uint16 = 1062
 		if mysqlErr.Number == uniqueConflictsErrNo {
 			// 唯一键冲突
+			tx.Rollback()
 			return errors.New("ZT账户已存在")
 		}
 	}
-	return err
+	fmt.Printf("插入后 UserID: %d\n", obj.ID)
+	// 如果有岗位，则插入关系表
+	if len(postIds) > 0 {
+		var userPosts []SysUserPost
+		for _, postId := range postIds {
+			userPosts = append(userPosts, SysUserPost{
+				UserId: obj.ID,
+				PostId: postId,
+			})
+		}
+		if err := tx.Create(&userPosts).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	// 如果有角色，则插入关系表
+	if len(roleIds) > 0 {
+		var userRoles []SysUserRole
+		for _, roleId := range roleIds {
+			userRoles = append(userRoles, SysUserRole{
+				UserId: obj.ID,
+				RoleId: roleId,
+			})
+		}
+		if err := tx.Create(&userRoles).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit().Error
 }
 
 func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUser, error) {

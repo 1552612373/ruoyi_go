@@ -20,8 +20,8 @@ func NewSysUserService(repo *repository.SysUserRepository) *SysUserService {
 	}
 }
 
-func (svc *SysUserService) Create(ctx context.Context, obj domain.SysUser) error {
-	return svc.repo.Create(ctx, obj)
+func (svc *SysUserService) Create(ctx context.Context, obj domain.SysUser, postIds []int64, roleIds []int64) error {
+	return svc.repo.Create(ctx, obj, postIds, roleIds)
 }
 
 func (svc *SysUserService) Login(ctx context.Context, account string, password string) (domain.SysUser, error) {

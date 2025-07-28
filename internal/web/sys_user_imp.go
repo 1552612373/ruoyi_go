@@ -29,15 +29,15 @@ func toResUserObj(domainObj domain.SysUser) resUserObj {
 		domainObj.Remark = &remark
 	}
 	return resUserObj{
-		UserId:     domainObj.UserID,
+		UserId:     domainObj.ID,
 		UserName:   domainObj.UserName,
 		NickName:   domainObj.NickName,
 		Status:     domainObj.Status,
 		Remark:     remark,
 		UpdateBy:   domainObj.UpdateBy,
-		UpdateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		UpdateTime: utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.UpdateTime),
 		CreateBy:   domainObj.CreateBy,
-		CreateTime: utility.FormatTimestamp(utility.DefaultTimeFormat, domainObj.CreateTime),
+		CreateTime: utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.CreateTime),
 	}
 }
 
@@ -70,9 +70,43 @@ func (h *SysUserHandler) Signup(ctx *gin.Context) {
 		// 用户拥有的角色ID列表 ❌ 非必填
 		RoleIds []int64 `json:"roleIds,omitempty" example:"[1,2]"`
 
+		PostIds []int64 `json:"postIds,omitempty" example:"[1,2]"`
+
 		// 备注信息 ❌ 非必填
 		Remark string `json:"remark,omitempty" example:"系统管理员"`
 	}
+
+	var req SignupReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	err := h.svc.Create(ctx, domain.SysUser{
+		UserName:    req.UserName,
+		NickName:    req.NickName,
+		Password:    req.Password,
+		Status:      req.Status,
+		Phonenumber: req.Phonenumber,
+		Email:       req.Email,
+		Sex:         req.Sex,
+		DeptID:      &req.DeptId,
+		Remark:      &req.Remark,
+	}, req.PostIds, req.RoleIds)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
 }
 
 func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
@@ -97,7 +131,7 @@ func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
 		return
 	}
 
-	tokenStr := h.setJWTToken(ctx, obj.UserID, obj.UserName)
+	tokenStr := h.setJWTToken(ctx, obj.ID, obj.UserName)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
@@ -154,7 +188,7 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
 		"user": map[string]interface{}{
-			"userId":        obj.UserID,
+			"userId":        obj.ID,
 			"deptId":        obj.DeptID,
 			"userName":      obj.UserName,
 			"nickName":      obj.NickName,

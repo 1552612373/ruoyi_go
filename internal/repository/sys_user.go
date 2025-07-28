@@ -16,8 +16,8 @@ func NewSysUserRepository(dao *dao.SysUserDAO) *SysUserRepository {
 	}
 }
 
-func (repo *SysUserRepository) Create(ctx context.Context, obj domain.SysUser) error {
-	return repo.dao.Insert(ctx, repo.toDao(obj))
+func (repo *SysUserRepository) Create(ctx context.Context, obj domain.SysUser, postIds []int64, roleIds []int64) error {
+	return repo.dao.Insert(ctx, repo.toDao(obj), postIds, roleIds)
 }
 
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
@@ -44,7 +44,7 @@ func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.Sys
 
 func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	return dao.SysUser{
-		UserID:        obj.UserID,
+		ID:            obj.ID,
 		DeptID:        obj.DeptID,
 		UserName:      obj.UserName,
 		NickName:      obj.NickName,
@@ -69,7 +69,7 @@ func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 
 func (repo *SysUserRepository) toDomain(obj dao.SysUser) domain.SysUser {
 	return domain.SysUser{
-		UserID:        obj.UserID,
+		ID:            obj.ID,
 		DeptID:        obj.DeptID,
 		UserName:      obj.UserName,
 		NickName:      obj.NickName,
