@@ -348,9 +348,9 @@ func (h *SysUserHandler) GetRouters(ctx *gin.Context) {
 	})
 }
 
-func (h *SysUserHandler) VoidResponse(ctx *gin.Context) {
+func (h *SysUserHandler) DefaultPassword(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg":  "操作成功",
+		"msg":  "123456",
 		"code": 200,
 	})
 }

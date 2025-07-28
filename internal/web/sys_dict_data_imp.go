@@ -142,7 +142,7 @@ func (h *SysDictDataHandler) QueryDictDataType(ctx *gin.Context) {
 	// 获取路径参数 id
 	typeStr := ctx.Param("type")
 
-	domainList, total, err := h.svc.QueryList(ctx, 1, 20, typeStr)
+	domainList, _, err := h.svc.QueryList(ctx, 1, 99, typeStr)
 	if err != nil {
 		utility.ThrowSysErrowIfneeded(ctx, err)
 		return
@@ -154,10 +154,10 @@ func (h *SysDictDataHandler) QueryDictDataType(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":  rescode.Success,
-		"msg":   rescode.Success.String(),
-		"total": total,
-		"rows":  resList,
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+		// "total": total,
+		"data": resList,
 	})
 }
 
