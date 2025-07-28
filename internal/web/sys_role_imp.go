@@ -261,3 +261,29 @@ func (h *SysRoleHandler) DeleteRole(ctx *gin.Context) {
 	})
 
 }
+
+// 查询角色的所有菜单树和权限
+func (h *SysRoleHandler) QueryRoleMenuTree(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	// errx := h.svc.DeleteByDictId(ctx, id)
+	// if errx != nil {
+	// 	utility.ThrowSysErrowIfneeded(ctx, errx)
+	// 	return
+	// }
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"code": rescode.Success,
+	// 	"msg":  rescode.Success.String(),
+	// })
+
+}

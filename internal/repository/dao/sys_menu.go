@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -72,6 +73,13 @@ type SysMenu struct {
 	Remark string `json:"remark" gorm:"column:remark;default:''"`
 }
 
+type MenuTreeNode struct {
+	ID       int64           `json:"id"`
+	Label    string          `json:"label"`
+	Disabled bool            `json:"disabled"`
+	Children []*MenuTreeNode `json:"children,omitempty"`
+}
+
 type SysMenuDAO struct {
 	db *gorm.DB
 }
@@ -138,4 +146,64 @@ func (dao *SysMenuDAO) QueryById(ctx context.Context, id int64) (SysMenu, error)
 func (dao *SysMenuDAO) DeleteById(ctx context.Context, id int64) error {
 	err := dao.db.WithContext(ctx).Where("menu_id = ?", id).Delete(&SysMenu{}).Error
 	return err
+}
+
+func (dao *SysMenuDAO) GetMenuTree(ctx context.Context) ([]*MenuTreeNode, error) {
+	var objList []SysMenu
+	err := dao.db.Find(&objList).Error
+	if err != nil {
+		return []*MenuTreeNode{}, err
+	}
+
+	tree := BuildMenuTree(objList)
+	return tree, nil
+}
+
+func BuildMenuTree(objList []SysMenu) []*MenuTreeNode {
+	// 1. 构建 map，用指针类型
+	objMap := make(map[int64]*MenuTreeNode)
+	for _, obj := range objList {
+		objMap[obj.MenuID] = &MenuTreeNode{
+			ID:       obj.MenuID,
+			Label:    obj.MenuName,
+			Disabled: false,
+		}
+	}
+
+	// 2. 构建父子关系
+	var roots []*MenuTreeNode
+	for _, obj := range objList {
+		node := objMap[obj.MenuID]
+
+		if obj.ParentID == 0 {
+			roots = append(roots, node)
+		} else {
+			if parent, exists := objMap[obj.ParentID]; exists {
+				parent.Children = append(parent.Children, node)
+			}
+		}
+	}
+
+	// 3. 按 order_num 排序（递归排序）
+	var sortNodes func([]*MenuTreeNode) []*MenuTreeNode
+	sortNodes = func(nodes []*MenuTreeNode) []*MenuTreeNode {
+		sort.Slice(nodes, func(i, j int) bool {
+			return getMenuOrder(objList, nodes[i].ID) < getMenuOrder(objList, nodes[j].ID)
+		})
+		for i := range nodes {
+			nodes[i].Children = sortNodes(nodes[i].Children)
+		}
+		return nodes
+	}
+
+	return sortNodes(roots)
+}
+
+func getMenuOrder(objList []SysMenu, id int64) int {
+	for _, obj := range objList {
+		if obj.MenuID == id {
+			return obj.OrderNum
+		}
+	}
+	return 9999
 }

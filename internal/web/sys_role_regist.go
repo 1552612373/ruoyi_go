@@ -30,5 +30,7 @@ func (h *SysRoleHandler) RegistRoutes(server *gin.Engine) {
 		group.GET("/system/role/:id", h.QueryRoleDetail)
 		// 删除角色
 		group.DELETE("/system/role/:id", h.DeleteRole)
+		// 查询角色的所有菜单树和权限
+		group.GET("/system/menu/roleMenuTreeselect/:id", h.QueryRoleMenuTree)
 	}
 }
