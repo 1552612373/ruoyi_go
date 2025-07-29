@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go_ruoyi_base/internal/domain"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -254,25 +255,62 @@ func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, SysDept
 	return sysUser, sysDept, nil
 }
 
-func (dao *SysUserDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysUser, int, error) {
+func (dao *SysUserDAO) QueryList(ctx context.Context, req domain.UserListReq) ([]SysUser, int, error) {
 	objList := []SysUser{}
 	db := dao.db.WithContext(ctx).Model(&SysUser{})
 
 	var total int64
 
-	// 查询总数
-	db.Count(&total)
+	// --- 构建查询条件 ---
+	// 注意：使用指针或零值检查来判断参数是否提供
+	if req.UserName != "" {
+		// 模糊查询，使用 LIKE
+		db = db.Where("user_name LIKE ?", "%"+req.UserName+"%")
+		// 或者精确查询: db = db.Where("user_name = ?", req.UserName)
+	}
+	if req.Phonenumber != "" {
+		// 通常手机号是精确匹配
+		db = db.Where("phonenumber = ?", req.Phonenumber)
+	}
+	if req.Status != "" {
+		// 状态通常是精确匹配
+		db = db.Where("status = ?", req.Status)
+	}
+
+	// 处理时间范围查询
+	// 假设 req.Params.BeginTime 和 req.Params.EndTime 是 string 类型
+	if req.Params.BeginTime != "" {
+		// 将字符串解析为 time.Time 进行比较更安全
+		// 这里简化处理，直接拼接字符串 (注意 SQL 注入风险极低，因为是日期格式)
+		// 更好的做法：解析成 time.Time 然后比较
+		// parsedTime, err := time.Parse("2006-01-02", req.Params.BeginTime)
+		// if err == nil {
+		//     db = db.Where("create_time >= ?", parsedTime)
+		// }
+		db = db.Where("create_time >= ?", req.Params.BeginTime+" 00:00:00")
+	}
+	if req.Params.EndTime != "" {
+		// 注意：EndTime 通常包含当天的 23:59:59
+		db = db.Where("create_time <= ?", req.Params.EndTime+" 23:59:59")
+	}
+	// --- 条件构建结束 ---
+
+	// 查询总数 (Count 会忽略 Limit 和 Offset，但会应用前面的 Where 条件)
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err // 如果 Count 出错，直接返回
+	}
 
 	// 分页处理
-	if pageNum <= 0 {
-		pageNum = 1
+	if req.PageNum <= 0 {
+		req.PageNum = 1
 	}
-	if pageSize <= 0 {
-		pageSize = 10
+	if req.PageSize <= 0 {
+		req.PageSize = 10
 	}
 
 	// 执行分页查询
-	err := db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&objList).Error
+	// 注意：Find 会应用前面的 Where, Offset, Limit
+	err := db.Offset((req.PageNum - 1) * req.PageSize).Limit(req.PageSize).Find(&objList).Error
 
 	return objList, int(total), err
 }

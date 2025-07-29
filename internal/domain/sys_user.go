@@ -66,3 +66,21 @@ type SysUser struct {
 
 	Dept SysDept `json:"dept"`
 }
+
+type Params struct {
+	BeginTime string `json:"beginTime" form:"params[beginTime]"` // URL 解码后是 params[beginTime]
+	EndTime   string `json:"endTime" form:"params[endTime]"`
+	// 或者如果希望直接解析为 time.Time 类型 (推荐用于日期比较)
+	// BeginTime time.Time `json:"beginTime" form:"params[beginTime]"`
+	// EndTime   time.Time `json:"endTime" form:"params[endTime]"`
+}
+
+// UserListReq 用于捕获完整的请求参数
+type UserListReq struct {
+	PageNum     int    `json:"pageNum" form:"pageNum"`
+	PageSize    int    `json:"pageSize" form:"pageSize"`
+	UserName    string `json:"userName" form:"userName"`       // 捕获 userName=aaa
+	Phonenumber string `json:"phonenumber" form:"phonenumber"` // 捕获 phonenumber=13112341234
+	Status      string `json:"status" form:"status"`           // 捕获 status=1
+	Params      Params `json:"params" form:""`                 // 关键：这里 form 标签留空，Gin 会自动根据子字段的 form 标签去查找
+}

@@ -44,8 +44,8 @@ func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.S
 	return domainSysUser, err
 }
 
-func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
-	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
+func (repo *SysUserRepository) QueryList(ctx context.Context, req domain.UserListReq) ([]domain.SysUser, int, error) {
+	daoList, total, err := repo.dao.QueryList(ctx, req)
 	return repo.toDomainList(ctx, daoList), total, err
 }
 

@@ -483,12 +483,8 @@ func (h *SysUserHandler) DefaultPassword(ctx *gin.Context) {
 
 // 查询用户列表
 func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
-	type typeReq struct {
-		PageNum  int `json:"pageNum" form:"pageNum"`
-		PageSize int `json:"pageSize" form:"pageSize"`
-	}
 
-	var req typeReq
+	var req domain.UserListReq
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -498,7 +494,7 @@ func (h *SysUserHandler) QueryUserList(ctx *gin.Context) {
 		return
 	}
 
-	domainList, total, err := h.svc.QueryList(ctx, req.PageNum, req.PageSize)
+	domainList, total, err := h.svc.QueryList(ctx, req)
 	if err != nil {
 		utility.ThrowSysErrowIfneeded(ctx, err)
 		return

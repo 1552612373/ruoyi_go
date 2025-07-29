@@ -51,8 +51,8 @@ func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUse
 	return domainSysUser, err
 }
 
-func (svc *SysUserService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
-	return svc.repo.QueryList(ctx, pageNum, pageSize)
+func (svc *SysUserService) QueryList(ctx context.Context, req domain.UserListReq) ([]domain.SysUser, int, error) {
+	return svc.repo.QueryList(ctx, req)
 }
 
 // 查看通用系统用户：岗位post列表和角色role列表
