@@ -45,3 +45,8 @@
 ```bash
 git clone https://your-repo-url/ruoyi-go.git
 cd ruoyi-go
+```
+
+所有接口路径统一加了前缀 `/api`，例如：`/api/login`、`/api/user/list`
+
+若使用`Vue`前端，请在 `vite.config.js` 中配置代理
