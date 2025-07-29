@@ -55,7 +55,7 @@ func toResUserObj(domainObj domain.SysUser) resUserObj {
 		UserName:    domainObj.UserName,
 		NickName:    domainObj.NickName,
 		Status:      domainObj.Status,
-		Remark:      remark,
+		Remark:      *domainObj.Remark,
 		UpdateBy:    domainObj.UpdateBy,
 		UpdateTime:  utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.UpdateTime),
 		CreateBy:    domainObj.CreateBy,
