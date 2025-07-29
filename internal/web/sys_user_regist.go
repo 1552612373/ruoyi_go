@@ -45,7 +45,7 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 
 		group.GET("/system/config/configKey/sys.user.initPassword", h.DefaultPassword)
 
-		// 临时
+		// 获取首页菜单项
 		group.GET("/getRouters", h.GetRouters)
 
 	}

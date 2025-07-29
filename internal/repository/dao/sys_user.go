@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go_ruoyi_base/internal/domain"
+	"sort"
 	"strings"
 	"time"
 
@@ -489,6 +490,27 @@ func (dao *SysUserDAO) GetRoutersById(ctx context.Context, userId int64) ([]map[
 	if len(menus) == 0 {
 		return []map[string]interface{}{}, nil
 	}
+
+	// ====== 新增：将 menu_id 为 1,2,3,4 的菜单移到最后 ======
+	specialIDs := map[int64]bool{1: true, 2: true, 3: true, 4: true}
+	var normalMenus, specialMenus []SysMenu
+
+	for _, menu := range menus {
+		if specialIDs[menu.MenuID] { // 请根据你的结构体字段名调整：MenuID / MenuId / ID
+			specialMenus = append(specialMenus, menu)
+		} else {
+			normalMenus = append(normalMenus, menu)
+		}
+	}
+
+	// 对 specialMenus 按 menu_id 升序排序
+	sort.Slice(specialMenus, func(i, j int) bool {
+		return specialMenus[i].MenuID < specialMenus[j].MenuID
+	})
+
+	// 合并：正常菜单 + 特殊菜单
+	menus = append(normalMenus, specialMenus...)
+	// =======================================
 
 	// 构建路由树（使用之前修正的 buildMenuTree）
 	return buildMenuTree(menus), nil
