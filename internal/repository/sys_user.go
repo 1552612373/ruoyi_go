@@ -78,6 +78,14 @@ func (repo *SysUserRepository) DeleteById(ctx context.Context, id int64) error {
 	return err
 }
 
+func (repo *SysUserRepository) GetRoutersById(ctx context.Context, userId int64) ([]map[string]interface{}, error) {
+	menusMap, err := repo.dao.GetRoutersById(ctx, userId)
+	if err != nil {
+		return []map[string]interface{}{}, err
+	}
+	return menusMap, nil
+}
+
 // 查看通用系统用户：岗位post列表和角色role列表
 func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
 	return repo.dao.GetSystemUserBase(ctx)

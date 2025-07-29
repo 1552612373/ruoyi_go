@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go_ruoyi_base/internal/domain"
+	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -442,4 +443,147 @@ func (dao *SysUserDAO) DeleteById(ctx context.Context, id int64) error {
 	}
 	// 提交事务
 	return tx.Commit().Error
+}
+
+func (dao *SysUserDAO) GetRoutersById(ctx context.Context, userId int64) ([]map[string]interface{}, error) {
+	var menus []SysMenu
+
+	// ====== 第一步：检查用户是否是超级管理员 ======
+	var superAdmin bool
+	err := dao.db.WithContext(ctx).
+		Table("sys_user_role").
+		Where("user_id = ? AND role_id = ?", userId, 1).
+		Select("1").
+		Take(&superAdmin).Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("检查超级管理员角色失败: %w", err)
+	}
+
+	// 如果是超级管理员，返回所有启用的 M/C 菜单
+	if superAdmin {
+		err = dao.db.WithContext(ctx).
+			Model(&domain.SysMenu{}).
+			Where("menu_type IN ? AND status = ?", []string{"M", "C"}, "0"). // status=0 正常
+			Order("parent_id ASC, order_num ASC, menu_id ASC").
+			Find(&menus).Error
+
+		if err != nil {
+			return nil, fmt.Errorf("查询所有菜单失败: %w", err)
+		}
+	} else {
+		// 普通用户：查询其角色拥有的菜单
+		err = dao.db.WithContext(ctx).
+			Table("sys_menu m").
+			Joins("JOIN sys_role_menu rm ON m.menu_id = rm.menu_id").
+			Joins("JOIN sys_user_role ur ON rm.role_id = ur.role_id").
+			Where("ur.user_id = ? AND m.menu_type IN ?", userId, []string{"M", "C"}).
+			Order("m.parent_id ASC, m.order_num ASC, m.menu_id ASC").
+			Find(&menus).Error
+
+		if err != nil {
+			return nil, fmt.Errorf("查询用户菜单失败: %w", err)
+		}
+	}
+
+	if len(menus) == 0 {
+		return []map[string]interface{}{}, nil
+	}
+
+	// 构建路由树（使用之前修正的 buildMenuTree）
+	return buildMenuTree(menus), nil
+}
+
+func buildMenuTree(menus []SysMenu) []map[string]interface{} {
+	menuMap := make(map[int64]map[string]interface{})
+	var rootMenus []map[string]interface{}
+
+	// 第一步：构建所有节点
+	for _, m := range menus {
+		meta := map[string]interface{}{
+			"title":   m.MenuName,
+			"icon":    m.Icon,
+			"noCache": m.IsCache == 1,
+			"link":    interface{}(nil),
+		}
+
+		if m.IsFrame == 0 { // 外链
+			meta["link"] = m.Path
+		}
+
+		// ====== 路径处理：根节点加 /，子节点不加 / ======
+		path := m.Path
+		if m.ParentID == 0 {
+			// 根节点：确保以 / 开头，且不以 / 结尾（除非是 "/")
+			if !strings.HasPrefix(path, "/") {
+				path = "/" + path
+			}
+			// 避免 // 或 /xxx/
+			path = strings.TrimSuffix(path, "/")
+			if path != "/" {
+				path = strings.TrimSuffix(path, "/")
+			}
+		} else {
+			// 子节点：确保不以 / 开头
+			path = strings.TrimPrefix(path, "/")
+		}
+
+		item := map[string]interface{}{
+			"name":      m.RouteName,
+			"path":      path, // 使用处理后的 path
+			"component": m.Component,
+			"hidden":    m.Visible == "1",
+			"meta":      meta,
+			"children":  []map[string]interface{}{},
+		}
+
+		// 检查是否有子菜单
+		hasChildren := false
+		for _, child := range menus {
+			if child.ParentID == m.MenuID {
+				hasChildren = true
+				break
+			}
+		}
+
+		if hasChildren {
+			item["redirect"] = "noRedirect"
+
+			// 设置 component
+			if m.MenuType == "M" {
+				if m.ParentID == 0 {
+					if m.Component == "" || m.Component == "Layout" {
+						item["component"] = "Layout"
+					}
+				} else {
+					if m.Component == "" || m.Component == "ParentView" {
+						item["component"] = "ParentView"
+					}
+				}
+			}
+
+			item["alwaysShow"] = m.MenuType == "M"
+		} else {
+			item["redirect"] = nil
+			item["alwaysShow"] = false
+		}
+
+		menuMap[m.MenuID] = item
+
+		if m.ParentID == 0 {
+			rootMenus = append(rootMenus, item)
+		}
+	}
+
+	// 第二步：挂载 children
+	for _, m := range menus {
+		if m.ParentID != 0 {
+			if parent, exists := menuMap[m.ParentID]; exists {
+				children := parent["children"].([]map[string]interface{})
+				parent["children"] = append(children, menuMap[m.MenuID])
+			}
+		}
+	}
+
+	return rootMenus
 }

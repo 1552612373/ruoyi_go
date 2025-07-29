@@ -162,6 +162,14 @@ func (h *SysMenuHandler) QueryMenuList(ctx *gin.Context) {
 
 	resList := []resMenuObj{}
 	for _, domainObj := range domainList {
+		// 忽略
+		if domainObj.MenuID == 106 || // 参数设置
+			domainObj.MenuID == 107 || // 通知公共
+			domainObj.MenuID == 108 || // 日志管理
+			domainObj.ParentID == 2 || // 在线用户;定时任务；数据监控；服务监控；缓存列表
+			domainObj.ParentID == 3 { // 表单构建；代码生产；系统接口
+			continue
+		}
 		resList = append(resList, toResMenuObj(domainObj))
 	}
 

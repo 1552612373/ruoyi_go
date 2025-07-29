@@ -75,3 +75,11 @@ func (svc *SysUserService) QueryById(ctx context.Context, id int64) (domain.SysU
 func (svc *SysUserService) DeleteById(ctx context.Context, id int64) error {
 	return svc.repo.DeleteById(ctx, id)
 }
+
+func (svc *SysUserService) GetRoutersById(ctx context.Context, userId int64) ([]map[string]interface{}, error) {
+	menusMap, err := svc.repo.GetRoutersById(ctx, userId)
+	if err != nil {
+		return []map[string]interface{}{}, err
+	}
+	return menusMap, nil
+}
