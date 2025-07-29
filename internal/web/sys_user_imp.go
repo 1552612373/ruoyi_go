@@ -347,7 +347,7 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 		})
 	}
 
-	obj, err := h.svc.GetInfo(ctx, claimsObj.UserId)
+	obj, permissions, roles, err := h.svc.GetInfo(ctx, claimsObj.UserId)
 	if err != nil {
 		utility.ThrowSysErrowIfneeded(ctx, err)
 		return
@@ -355,17 +355,21 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 
 	resObj := toResUserObj(obj)
 
+	// 如果roles有admin，给permissions新赋值
+	for _, roleKey := range roles {
+		if roleKey == "admin" {
+			permissions = []string{"*:*:*"}
+			break
+		}
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
 		"user": resObj,
 		// 临时这样写
-		"permissions": []string{
-			"*:*:*",
-		},
-		"roles": []string{
-			"admin",
-		},
+		"permissions":        permissions,
+		"roles":              roles,
 		"isDefaultModifyPwd": false,
 		"isPasswordExpired":  false,
 	})

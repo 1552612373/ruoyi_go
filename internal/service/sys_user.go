@@ -51,12 +51,12 @@ func (svc *SysUserService) Login(ctx context.Context, account string, password s
 	return domainSysUser, err
 }
 
-func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUser, error) {
-	domainSysUser, err := svc.repo.FindById(ctx, id)
+func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUser, []string, []string, error) {
+	domainSysUser, permissions, roles, err := svc.repo.FindById(ctx, id)
 	if err != nil {
-		return domain.SysUser{}, errors.New("ZT查询失败")
+		return domain.SysUser{}, []string{}, []string{}, errors.New("ZT查询失败")
 	}
-	return domainSysUser, err
+	return domainSysUser, permissions, roles, nil
 }
 
 func (svc *SysUserService) QueryList(ctx context.Context, req domain.UserListReq) ([]domain.SysUser, int, error) {

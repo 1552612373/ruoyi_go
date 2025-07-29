@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -146,6 +147,61 @@ func (dao *SysMenuDAO) QueryById(ctx context.Context, id int64) (SysMenu, error)
 func (dao *SysMenuDAO) DeleteById(ctx context.Context, id int64) error {
 	err := dao.db.WithContext(ctx).Where("menu_id = ?", id).Delete(&SysMenu{}).Error
 	return err
+}
+
+// GetPermissionsByUserID 根据用户ID查询其拥有的所有权限字符串 (perms)
+func (dao *SysMenuDAO) GetPermissionsByUserID(ctx context.Context, userID int64) ([]string, error) {
+	var permissions []string
+
+	// 使用 GORM 的 Joins 查询
+	// 从 sys_menu 开始，通过 sys_role_menu 关联到 sys_role，再通过 sys_user_role 关联到 sys_user
+	err := dao.db.WithContext(ctx).
+		Table("sys_menu m").
+		Joins("JOIN sys_role_menu rm ON m.menu_id = rm.menu_id").
+		Joins("JOIN sys_role r ON rm.role_id = r.role_id").
+		Joins("JOIN sys_user_role ur ON r.role_id = ur.role_id").
+		Joins("JOIN sys_user u ON ur.user_id = u.user_id").
+		Where("u.user_id = ?", userID).
+		// 去重，因为一个用户可能通过多个角色拥有同一个权限
+		Distinct("m.perms").
+		Pluck("m.perms", &permissions).Error
+
+	// 处理错误
+	if err != nil {
+		return nil, fmt.Errorf("failed to query permissions for user %d: %w", userID, err)
+	}
+
+	return permissions, nil
+}
+
+// GetRoleKeysByUserID 根据用户ID查询其拥有的所有角色标识 (role_key)
+// 返回的 roleKeys 列表可能包含重复项，但通常不会，因为一个用户对同一个角色只会有一次关联。
+func (dao *SysMenuDAO) GetRoleKeysByUserID(ctx context.Context, userID int64) ([]string, error) {
+	var roleKeys []string
+
+	// 构建查询
+	err := dao.db.WithContext(ctx).
+		// 从 sys_role 表开始，因为我们最终要取 role_key
+		Table("sys_role r").
+		// 连接 sys_user_role 表，通过 role_id 关联
+		Joins("JOIN sys_user_role ur ON r.role_id = ur.role_id").
+		// 连接 sys_user 表，通过 user_id 关联，用于筛选
+		Joins("JOIN sys_user u ON ur.user_id = u.user_id").
+		// 筛选出指定 userID 的记录
+		Where("u.user_id = ?", userID).
+		// 去重，防止因数据异常导致重复 (虽然通常不会)
+		Distinct("r.role_key").
+		// 提取 role_key 字段的值到 roleKeys 切片中
+		Pluck("r.role_key", &roleKeys).Error
+
+	// 如果查询出错（如数据库连接问题），返回错误
+	if err != nil {
+		return nil, fmt.Errorf("failed to query role keys for user %d: %w", userID, err)
+	}
+
+	// 查询成功，返回 roleKeys 列表
+	// 注意：如果用户没有任何角色，roleKeys 将是空切片 []string{}，而不是 nil
+	return roleKeys, nil
 }
 
 func (dao *SysMenuDAO) GetMenuTree(ctx context.Context) ([]*MenuTreeNode, error) {

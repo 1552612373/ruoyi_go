@@ -89,14 +89,16 @@ type SysUserDAO struct {
 	postDao *SysPostDAO
 	roleDao *SysRoleDAO
 	deptDao *SysDeptDAO
+	menuDao *SysMenuDAO
 }
 
-func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO, deptDao *SysDeptDAO) *SysUserDAO {
+func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO, deptDao *SysDeptDAO, menuDao *SysMenuDAO) *SysUserDAO {
 	return &SysUserDAO{
 		db:      db,
 		postDao: postDao,
 		roleDao: roleDao,
 		deptDao: deptDao,
+		menuDao: menuDao,
 	}
 }
 
@@ -277,20 +279,6 @@ func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUs
 	return sysUser, err
 }
 
-func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, SysDept, error) {
-	// 查询用户详情
-	sysUser := SysUser{}
-	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
-	if err != nil {
-		return SysUser{}, SysDept{}, err
-	}
-	sysDept, errx := dao.deptDao.QueryByDeptId(ctx, *sysUser.DeptID)
-	if errx != nil {
-		return SysUser{}, SysDept{}, errx
-	}
-	return sysUser, sysDept, nil
-}
-
 func (dao *SysUserDAO) QueryList(ctx context.Context, req domain.UserListReq) ([]SysUser, int, error) {
 	objList := []SysUser{}
 	db := dao.db.WithContext(ctx).Model(&SysUser{})
@@ -362,6 +350,25 @@ func (dao *SysUserDAO) GetSystemUserBase(ctx context.Context) ([]SysPost, []SysR
 		return []SysPost{}, []SysRole{}, err
 	}
 	return postObjList, roleObjList, nil
+}
+
+// 需要带权限、角色等
+func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, SysDept, []string, []string, error) {
+	// 查询用户详情
+	sysUser := SysUser{}
+	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
+	if err != nil {
+		return SysUser{}, SysDept{}, []string{}, []string{}, err
+	}
+	sysDept, errx := dao.deptDao.QueryByDeptId(ctx, *sysUser.DeptID)
+	if errx != nil {
+		return SysUser{}, SysDept{}, []string{}, []string{}, errx
+	}
+	permissions, _ := dao.menuDao.GetPermissionsByUserID(ctx, id)
+
+	roles, _ := dao.menuDao.GetRoleKeysByUserID(ctx, id)
+
+	return sysUser, sysDept, permissions, roles, nil
 }
 
 // 需要带post的id和详情列表，role的id和详情列表

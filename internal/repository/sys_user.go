@@ -40,16 +40,22 @@ func (repo *SysUserRepository) ResetPwd(ctx context.Context, userId int64, passw
 
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
 	daoSysUser, err := repo.dao.FindByAccount(ctx, account)
+	if err != nil {
+		return domain.SysUser{}, err
+	}
 	domainSysUser := repo.toDomain(ctx, daoSysUser)
 	return domainSysUser, err
 }
 
-func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.SysUser, error) {
-	daoSysUser, daoSysDept, err := repo.dao.FindById(ctx, id)
+func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.SysUser, []string, []string, error) {
+	daoSysUser, daoSysDept, permissions, roles, err := repo.dao.FindById(ctx, id)
+	if err != nil {
+		return domain.SysUser{}, []string{}, []string{}, err
+	}
 	domainSysUser := repo.toDomain(ctx, daoSysUser)
 	domainSysDept := repo.deptRepo.toDomain(daoSysDept)
 	domainSysUser.Dept = domainSysDept
-	return domainSysUser, err
+	return domainSysUser, permissions, roles, err
 }
 
 func (repo *SysUserRepository) QueryList(ctx context.Context, req domain.UserListReq) ([]domain.SysUser, int, error) {
