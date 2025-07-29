@@ -30,6 +30,10 @@ func (repo *SysUserRepository) Update(ctx context.Context, obj domain.SysUser, p
 	return repo.dao.Update(ctx, repo.toDao(obj), postIds, roleIds)
 }
 
+func (repo *SysUserRepository) ChangeStatus(ctx context.Context, userId int64, status string) error {
+	return repo.dao.ChangeStatus(ctx, userId, status)
+}
+
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
 	daoSysUser, err := repo.dao.FindByAccount(ctx, account)
 	domainSysUser := repo.toDomain(ctx, daoSysUser)

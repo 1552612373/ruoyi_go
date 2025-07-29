@@ -235,6 +235,24 @@ func (dao *SysUserDAO) Update(ctx context.Context, obj SysUser, postIds []int64,
 	return tx.Commit().Error
 }
 
+func (dao *SysUserDAO) ChangeStatus(ctx context.Context, userId int64, status string) error {
+
+	// 检查 ID 是否有效
+	if userId == 0 {
+		return errors.New("用户ID不能为空")
+	}
+
+	userUpdates := map[string]interface{}{
+		"status": status,
+	}
+
+	if err := dao.db.WithContext(ctx).Model(SysUser{}).Where("user_id = ?", userId).Updates(userUpdates).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUser, error) {
 	sysUser := SysUser{}
 	err := dao.db.WithContext(ctx).Where("user_name = ?", account).First(&sysUser).Error

@@ -28,6 +28,10 @@ func (svc *SysUserService) Update(ctx context.Context, obj domain.SysUser, postI
 	return svc.repo.Update(ctx, obj, postIds, roleIds)
 }
 
+func (svc *SysUserService) ChangeStatus(ctx context.Context, userId int64, status string) error {
+	return svc.repo.ChangeStatus(ctx, userId, status)
+}
+
 func (svc *SysUserService) Login(ctx context.Context, account string, password string) (domain.SysUser, error) {
 	domainSysUser, err := svc.repo.FindByAccount(ctx, account)
 	if err == gorm.ErrRecordNotFound {
