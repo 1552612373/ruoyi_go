@@ -13,15 +13,27 @@ import (
 )
 
 type resUserObj struct {
-	UserId     int64  `json:"userId"`
-	UserName   string `json:"userName"`
-	NickName   string `json:"nickName"`
-	Status     string `json:"status"`
-	CreateBy   string `json:"createBy"`
-	CreateTime string `json:"createTime"`
-	UpdateBy   string `json:"updateBy"`
-	UpdateTime string `json:"updateTime"`
-	Remark     string `json:"remark"`
+	// Admin      bool   `json:"admin"`
+	// dept字典;password;postIds;pwdUpdateDate;roleId;roleIds;roles
+
+	Avatar      string         `json:"avatar"`
+	DelFlag     string         `json:"delFlag"`
+	DeptId      int64          `json:"deptId"`
+	Dept        domain.SysDept `json:"dept"`
+	Email       string         `json:"email"`
+	LoginDate   string         `json:"loginDate"`
+	LoginIp     string         `json:"loginIp"`
+	Phonenumber string         `json:"phonenumber"`
+	Sex         string         `json:"sex"`
+	UserId      int64          `json:"userId"`
+	UserName    string         `json:"userName"`
+	NickName    string         `json:"nickName"`
+	Status      string         `json:"status"`
+	CreateBy    string         `json:"createBy"`
+	CreateTime  string         `json:"createTime"`
+	UpdateBy    string         `json:"updateBy"`
+	UpdateTime  string         `json:"updateTime"`
+	Remark      string         `json:"remark"`
 }
 
 func toResUserObj(domainObj domain.SysUser) resUserObj {
@@ -30,15 +42,24 @@ func toResUserObj(domainObj domain.SysUser) resUserObj {
 		domainObj.Remark = &remark
 	}
 	return resUserObj{
-		UserId:     domainObj.ID,
-		UserName:   domainObj.UserName,
-		NickName:   domainObj.NickName,
-		Status:     domainObj.Status,
-		Remark:     remark,
-		UpdateBy:   domainObj.UpdateBy,
-		UpdateTime: utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.UpdateTime),
-		CreateBy:   domainObj.CreateBy,
-		CreateTime: utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.CreateTime),
+		Avatar:    domainObj.Avatar,
+		DelFlag:   domainObj.DelFlag,
+		DeptId:    *domainObj.DeptID,
+		Dept:      domainObj.Dept,
+		Email:     domainObj.Email,
+		LoginDate: utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.LoginDate),
+		// LoginIp:     domainObj.LoginIp,
+		Phonenumber: domainObj.Phonenumber,
+		Sex:         domainObj.Sex,
+		UserId:      domainObj.ID,
+		UserName:    domainObj.UserName,
+		NickName:    domainObj.NickName,
+		Status:      domainObj.Status,
+		Remark:      remark,
+		UpdateBy:    domainObj.UpdateBy,
+		UpdateTime:  utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.UpdateTime),
+		CreateBy:    domainObj.CreateBy,
+		CreateTime:  utility.FormatTimePtr(utility.DefaultTimeFormat, domainObj.CreateTime),
 	}
 }
 
@@ -185,31 +206,12 @@ func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 		return
 	}
 
+	resObj := toResUserObj(obj)
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"user": map[string]interface{}{
-			"userId":        obj.ID,
-			"deptId":        obj.DeptID,
-			"userName":      obj.UserName,
-			"nickName":      obj.NickName,
-			"userType":      obj.UserType,
-			"email":         obj.Email,
-			"phonenumber":   obj.Phonenumber,
-			"sex":           obj.Sex,
-			"avatar":        obj.Avatar,
-			"password":      obj.Password,
-			"status":        obj.Status,
-			"delFlag":       obj.DelFlag,
-			"loginIp":       obj.LoginIP,
-			"loginDate":     obj.LoginDate,
-			"pwdUpdateDate": obj.PwdUpdateDate,
-			"createBy":      obj.CreateBy,
-			"createTime":    obj.CreateTime,
-			"updateBy":      obj.UpdateBy,
-			"updateTime":    obj.UpdateTime,
-			"remark":        obj.Remark,
-		},
+		"user": resObj,
 		// 临时这样写
 		"permissions": []string{
 			"*:*:*",
@@ -455,7 +457,13 @@ func (h *SysUserHandler) QueryUserDetail(ctx *gin.Context) {
 		return
 	}
 
-	domainObj, err := h.svc.QueryById(ctx, id)
+	obj, err := h.svc.GetInfo(ctx, id)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	resObj := toResUserObj(obj)
 
 	if err != nil {
 		utility.ThrowSysErrowIfneeded(ctx, err)
@@ -465,7 +473,7 @@ func (h *SysUserHandler) QueryUserDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": toResUserObj(domainObj),
+		"data": resObj,
 	})
 }
 

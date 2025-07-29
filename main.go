@@ -142,8 +142,9 @@ func initSysUser(db *gorm.DB) *web.SysUserHandler {
 	postDao := dao.NewSysPostDAO(db)
 	menuDao := dao.NewSysMenuDAO(db)
 	roleDao := dao.NewSysRoleDAO(db, menuDao)
+	deptDao := dao.NewSysDeptDAO(db)
 
-	myDao := dao.NewSysUserDAO(db, postDao, roleDao)
+	myDao := dao.NewSysUserDAO(db, postDao, roleDao, deptDao)
 	myRepo := repository.NewSysUserRepository(myDao)
 	mySvc := service.NewSysUserService(myRepo)
 	myHandler := web.NewSysUserHandler(mySvc)

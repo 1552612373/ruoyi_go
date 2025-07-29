@@ -40,11 +40,11 @@ func (svc *SysUserService) Login(ctx context.Context, account string, password s
 }
 
 func (svc *SysUserService) GetInfo(ctx context.Context, id int64) (domain.SysUser, error) {
-	ad, err := svc.repo.FindById(ctx, id)
+	domainSysUser, err := svc.repo.FindById(ctx, id)
 	if err != nil {
 		return domain.SysUser{}, errors.New("ZT查询失败")
 	}
-	return ad, nil
+	return domainSysUser, err
 }
 
 func (svc *SysUserService) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {

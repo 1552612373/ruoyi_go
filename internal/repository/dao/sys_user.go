@@ -87,13 +87,15 @@ type SysUserDAO struct {
 	db      *gorm.DB
 	postDao *SysPostDAO
 	roleDao *SysRoleDAO
+	deptDao *SysDeptDAO
 }
 
-func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO) *SysUserDAO {
+func NewSysUserDAO(db *gorm.DB, postDao *SysPostDAO, roleDao *SysRoleDAO, deptDao *SysDeptDAO) *SysUserDAO {
 	return &SysUserDAO{
 		db:      db,
 		postDao: postDao,
 		roleDao: roleDao,
+		deptDao: deptDao,
 	}
 }
 
@@ -161,10 +163,18 @@ func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUs
 	return sysUser, err
 }
 
-func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, error) {
+func (dao *SysUserDAO) FindById(ctx context.Context, id int64) (SysUser, SysDept, error) {
+	// 查询用户详情
 	sysUser := SysUser{}
 	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
-	return sysUser, err
+	if err != nil {
+		return SysUser{}, SysDept{}, err
+	}
+	sysDept, errx := dao.deptDao.QueryByDeptId(ctx, *sysUser.DeptID)
+	if errx != nil {
+		return SysUser{}, SysDept{}, errx
+	}
+	return sysUser, sysDept, nil
 }
 
 func (dao *SysUserDAO) QueryList(ctx context.Context, pageNum int, pageSize int) ([]SysUser, int, error) {

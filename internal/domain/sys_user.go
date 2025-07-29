@@ -63,4 +63,6 @@ type SysUser struct {
 
 	// 备注
 	Remark *string `gorm:"column:remark" json:"remark"`
+
+	Dept SysDept `json:"dept"`
 }

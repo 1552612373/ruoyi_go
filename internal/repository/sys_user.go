@@ -7,7 +7,8 @@ import (
 )
 
 type SysUserRepository struct {
-	dao *dao.SysUserDAO
+	dao      *dao.SysUserDAO
+	deptRepo *SysDeptRepository
 }
 
 func NewSysUserRepository(dao *dao.SysUserDAO) *SysUserRepository {
@@ -27,8 +28,10 @@ func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string
 }
 
 func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.SysUser, error) {
-	daoSysUser, err := repo.dao.FindById(ctx, id)
+	daoSysUser, daoSysDept, err := repo.dao.FindById(ctx, id)
 	domainSysUser := repo.toDomain(daoSysUser)
+	domainSysDept := repo.deptRepo.toDomain(daoSysDept)
+	domainSysUser.Dept = domainSysDept
 	return domainSysUser, err
 }
 
