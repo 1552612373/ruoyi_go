@@ -8,12 +8,17 @@ import (
 
 type SysUserRepository struct {
 	dao      *dao.SysUserDAO
+	postRepo *SysPostRepository
+	roleRepo *SysRoleRepository
 	deptRepo *SysDeptRepository
 }
 
-func NewSysUserRepository(dao *dao.SysUserDAO) *SysUserRepository {
+func NewSysUserRepository(dao *dao.SysUserDAO, postRepo *SysPostRepository, roleRepo *SysRoleRepository, deptRepo *SysDeptRepository) *SysUserRepository {
 	return &SysUserRepository{
-		dao: dao,
+		dao:      dao,
+		postRepo: postRepo,
+		roleRepo: roleRepo,
+		deptRepo: deptRepo,
 	}
 }
 
@@ -40,9 +45,14 @@ func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageS
 	return repo.toDomainList(daoList), total, err
 }
 
-func (repo *SysUserRepository) QueryById(ctx context.Context, id int64) (domain.SysUser, error) {
-	daoObj, err := repo.dao.QueryById(ctx, id)
-	return repo.toDomain(daoObj), err
+func (repo *SysUserRepository) QueryById(ctx context.Context, id int64) (domain.SysUser, []int64, []domain.SysPost, []int64, []domain.SysRole, error) {
+	daoSysUser, daoSysDept, postIds, daoPosts, roleIds, daoRoles, err := repo.dao.QueryById(ctx, id)
+	domainSysUser := repo.toDomain(daoSysUser)
+	domainSysDept := repo.deptRepo.toDomain(daoSysDept)
+	domainSysUser.Dept = domainSysDept
+	domainPosts := repo.postRepo.toDomainList(daoPosts)
+	domainRoles := repo.roleRepo.toDomainList(daoRoles)
+	return domainSysUser, postIds, domainPosts, roleIds, domainRoles, err
 }
 
 func (repo *SysUserRepository) DeleteById(ctx context.Context, id int64) error {

@@ -191,6 +191,49 @@ func (h *SysUserHandler) Logout(ctx *gin.Context) {
 	})
 }
 
+// 查询用户详情
+func (h *SysUserHandler) QueryUserDetail(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainSysUser, postIds, domainPosts, roleIds, domainRoles, err := h.svc.QueryById(ctx, id)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	resObj := toResUserObj(domainSysUser)
+
+	resPostList := []resPostObj{}
+	for _, domainObj := range domainPosts {
+		resPostList = append(resPostList, ToResPostObj(domainObj))
+	}
+
+	resRoleList := []resRoleObj{}
+	for _, domainObj := range domainRoles {
+		resRoleList = append(resRoleList, ToResRoleObj(domainObj))
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    rescode.Success,
+		"msg":     rescode.Success.String(),
+		"data":    resObj,
+		"postIds": postIds,
+		"posts":   resPostList,
+		"roleIds": roleIds,
+		"roles":   resRoleList,
+	})
+}
+
+// 查询当前用户详情，和上面用户详情返回字段和格式有所不同
 func (h *SysUserHandler) GetInfo(ctx *gin.Context) {
 	claimsObj, ok := ctx.MustGet(utility.ClaimsName).(utility.UserClaims)
 	if !ok {
@@ -441,39 +484,6 @@ func (h *SysUserHandler) GetSystemUserBase(ctx *gin.Context) {
 		"msg":   rescode.Success.String(),
 		"posts": postObjList,
 		"roles": roleObjList,
-	})
-}
-
-// 查询用户详情
-func (h *SysUserHandler) QueryUserDetail(ctx *gin.Context) {
-	// 获取路径参数 id
-	idStr := ctx.Param("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"code": rescode.ErrInvalidParam,
-			"msg":  "无效的字典类型ID",
-		})
-		return
-	}
-
-	obj, err := h.svc.GetInfo(ctx, id)
-	if err != nil {
-		utility.ThrowSysErrowIfneeded(ctx, err)
-		return
-	}
-
-	resObj := toResUserObj(obj)
-
-	if err != nil {
-		utility.ThrowSysErrowIfneeded(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": rescode.Success,
-		"msg":  rescode.Success.String(),
-		"data": resObj,
 	})
 }
 

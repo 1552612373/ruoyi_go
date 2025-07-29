@@ -25,7 +25,7 @@ type resPostObj struct {
 	UpdateTime string `json:"updateTime"`
 }
 
-func toResPostObj(domainObj domain.SysPost) resPostObj {
+func ToResPostObj(domainObj domain.SysPost) resPostObj {
 	return resPostObj{
 		PostId:     domainObj.PostID,
 		CreateBy:   domainObj.CreateBy,
@@ -175,7 +175,7 @@ func (h *SysPostHandler) QueryPostList(ctx *gin.Context) {
 
 	resList := []resPostObj{}
 	for _, domainObj := range domainList {
-		resList = append(resList, toResPostObj(domainObj))
+		resList = append(resList, ToResPostObj(domainObj))
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -209,7 +209,7 @@ func (h *SysPostHandler) QueryPostDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": toResPostObj(domainObj),
+		"data": ToResPostObj(domainObj),
 	})
 }
 

@@ -213,10 +213,49 @@ func (dao *SysUserDAO) GetSystemUserBase(ctx context.Context) ([]SysPost, []SysR
 	return postObjList, roleObjList, nil
 }
 
-func (dao *SysUserDAO) QueryById(ctx context.Context, id int64) (SysUser, error) {
-	obj := SysUser{}
-	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&obj)
-	return obj, err.Error
+// 需要带post的id和详情列表，role的id和详情列表
+func (dao *SysUserDAO) QueryById(ctx context.Context, id int64) (SysUser, SysDept, []int64, []SysPost, []int64, []SysRole, error) {
+	// 查询用户详情
+	sysUser := SysUser{}
+	err := dao.db.WithContext(ctx).Where("user_id = ?", id).First(&sysUser).Error
+	if err != nil {
+		return SysUser{}, SysDept{}, []int64{}, []SysPost{}, []int64{}, []SysRole{}, err
+	}
+	sysDept, errx := dao.deptDao.QueryByDeptId(ctx, *sysUser.DeptID)
+	if errx != nil {
+		return SysUser{}, SysDept{}, []int64{}, []SysPost{}, []int64{}, []SysRole{}, errx
+	}
+
+	// 查该用户岗位
+	var postRelations []SysUserPost
+	erry := dao.db.Where("user_id = ?", id).Find(&postRelations).Error
+	if erry != nil {
+		return SysUser{}, SysDept{}, []int64{}, []SysPost{}, []int64{}, []SysRole{}, erry
+	}
+	// 提取出该用户对应的id
+	var postIds []int64
+	for _, rel := range postRelations {
+		postIds = append(postIds, rel.PostId)
+	}
+
+	// 查该用户角色
+	var roleRelations []SysUserRole
+	errz := dao.db.Where("user_id = ?", id).Find(&roleRelations).Error
+	if errz != nil {
+		return SysUser{}, SysDept{}, []int64{}, []SysPost{}, []int64{}, []SysRole{}, errz
+	}
+	// 提取出该用户对应的id
+	var roleIds []int64
+	for _, rel := range roleRelations {
+		roleIds = append(roleIds, rel.RoleId)
+	}
+
+	// 查询所有岗位列表
+	daoPosts, _, _ := dao.postDao.QueryList(ctx, 1, 99)
+	// 查询所有角色列表
+	daoRoles, _, _ := dao.roleDao.QueryList(ctx, 1, 99)
+
+	return sysUser, sysDept, postIds, daoPosts, roleIds, daoRoles, nil
 }
 
 func (dao *SysUserDAO) DeleteById(ctx context.Context, id int64) error {

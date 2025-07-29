@@ -56,7 +56,7 @@ func (svc *SysUserService) GetSystemUserBase(ctx context.Context) ([]dao.SysPost
 	return svc.repo.GetSystemUserBase(ctx)
 }
 
-func (svc *SysUserService) QueryById(ctx context.Context, id int64) (domain.SysUser, error) {
+func (svc *SysUserService) QueryById(ctx context.Context, id int64) (domain.SysUser, []int64, []domain.SysPost, []int64, []domain.SysRole, error) {
 	return svc.repo.QueryById(ctx, id)
 }
 

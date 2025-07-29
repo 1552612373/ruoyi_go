@@ -33,7 +33,7 @@ type resRoleObj struct {
 	CreateTime        string  `json:"createTime"`
 }
 
-func toResRoleObj(domainObj domain.SysRole) resRoleObj {
+func ToResRoleObj(domainObj domain.SysRole) resRoleObj {
 	return resRoleObj{
 		RoleId:            domainObj.RoleId,
 		RoleName:          domainObj.RoleName,
@@ -214,7 +214,7 @@ func (h *SysRoleHandler) QueryRoleList(ctx *gin.Context) {
 
 	resList := []resRoleObj{}
 	for _, domainObj := range domainList {
-		resList = append(resList, toResRoleObj(domainObj))
+		resList = append(resList, ToResRoleObj(domainObj))
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -248,7 +248,7 @@ func (h *SysRoleHandler) QueryRoleDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
-		"data": toResRoleObj(domainObj),
+		"data": ToResRoleObj(domainObj),
 	})
 }
 
