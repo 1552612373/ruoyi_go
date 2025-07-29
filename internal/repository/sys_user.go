@@ -26,6 +26,10 @@ func (repo *SysUserRepository) Create(ctx context.Context, obj domain.SysUser, p
 	return repo.dao.Insert(ctx, repo.toDao(obj), postIds, roleIds)
 }
 
+func (repo *SysUserRepository) Update(ctx context.Context, obj domain.SysUser, postIds []int64, roleIds []int64) error {
+	return repo.dao.Update(ctx, repo.toDao(obj), postIds, roleIds)
+}
+
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
 	daoSysUser, err := repo.dao.FindByAccount(ctx, account)
 	domainSysUser := repo.toDomain(ctx, daoSysUser)

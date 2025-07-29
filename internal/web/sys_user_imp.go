@@ -131,6 +131,52 @@ func (h *SysUserHandler) Signup(ctx *gin.Context) {
 	})
 }
 
+func (h *SysUserHandler) Update(ctx *gin.Context) {
+	type UpdateReq struct {
+		ID          int64   `json:"userId"`
+		NickName    string  `json:"nickName"`
+		Status      string  `json:"status" binding:"required"`
+		Phonenumber string  `json:"phonenumber"`
+		Email       string  `json:"email"`
+		Sex         string  `json:"sex"`
+		DeptId      int64   `json:"deptId,omitempty"`
+		RoleIds     []int64 `json:"roleIds,omitempty"`
+		PostIds     []int64 `json:"postIds,omitempty"`
+		Remark      string  `json:"remark,omitempty"`
+	}
+
+	var req UpdateReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	err := h.svc.Update(ctx, domain.SysUser{
+		ID:          req.ID,
+		NickName:    req.NickName,
+		Status:      req.Status,
+		Phonenumber: req.Phonenumber,
+		Email:       req.Email,
+		Sex:         req.Sex,
+		DeptID:      &req.DeptId,
+		Remark:      &req.Remark,
+	}, req.PostIds, req.RoleIds)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+}
+
 func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
 	type LoginReq struct {
 		UserName string `json:"userName" binding:"required"`

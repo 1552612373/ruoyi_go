@@ -24,6 +24,10 @@ func (svc *SysUserService) Create(ctx context.Context, obj domain.SysUser, postI
 	return svc.repo.Create(ctx, obj, postIds, roleIds)
 }
 
+func (svc *SysUserService) Update(ctx context.Context, obj domain.SysUser, postIds []int64, roleIds []int64) error {
+	return svc.repo.Update(ctx, obj, postIds, roleIds)
+}
+
 func (svc *SysUserService) Login(ctx context.Context, account string, password string) (domain.SysUser, error) {
 	domainSysUser, err := svc.repo.FindByAccount(ctx, account)
 	if err == gorm.ErrRecordNotFound {

@@ -157,6 +157,83 @@ func (dao *SysUserDAO) Insert(ctx context.Context, obj SysUser, postIds []int64,
 	return tx.Commit().Error
 }
 
+func (dao *SysUserDAO) Update(ctx context.Context, obj SysUser, postIds []int64, roleIds []int64) error {
+	// 开启事务
+	tx := dao.db.WithContext(ctx).Begin()
+	// “延迟执行 + panic 捕获” 机制，用于在发生 panic 时，自动回滚事务，防止数据不一致
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 检查 ID 是否有效
+	if obj.ID == 0 {
+		tx.Rollback()
+		return errors.New("用户ID不能为空")
+	}
+
+	userUpdates := map[string]interface{}{
+		"nick_name":   obj.NickName,
+		"status":      obj.Status,
+		"phonenumber": obj.Phonenumber,
+		"email":       obj.Email,
+		"sex":         obj.Sex,
+		"dept_id":     *obj.DeptID, // 注意：obj.DeptId 是值，不是指针
+		"remark":      *obj.Remark, // 注意：obj.Remark 是值，不是指针
+	}
+
+	if err := tx.Model(SysUser{}).Where("user_id = ?", obj.ID).Updates(userUpdates).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 处理岗位关联
+	// 先删除该用户所有现有的岗位关联
+	if err := tx.Where("user_id = ?", obj.ID).Delete(&SysUserPost{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	// 如果有新的岗位 ID，则插入新的关联
+	if len(postIds) > 0 {
+		var userPosts []SysUserPost
+		for _, postId := range postIds {
+			userPosts = append(userPosts, SysUserPost{
+				UserId: obj.ID,
+				PostId: postId,
+			})
+		}
+		if err := tx.Create(&userPosts).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// 处理角色关联
+	// 先删除该用户所有现有的角色关联
+	if err := tx.Where("user_id = ?", obj.ID).Delete(&SysUserRole{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	// 如果有新的角色 ID，则插入新的关联
+	if len(roleIds) > 0 {
+		var userRoles []SysUserRole
+		for _, roleId := range roleIds {
+			userRoles = append(userRoles, SysUserRole{
+				UserId: obj.ID,
+				RoleId: roleId,
+			})
+		}
+		if err := tx.Create(&userRoles).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// 提交事务
+	return tx.Commit().Error
+}
+
 func (dao *SysUserDAO) FindByAccount(ctx context.Context, account string) (SysUser, error) {
 	sysUser := SysUser{}
 	err := dao.db.WithContext(ctx).Where("user_name = ?", account).First(&sysUser).Error
