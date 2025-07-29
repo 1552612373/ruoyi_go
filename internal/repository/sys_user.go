@@ -28,13 +28,13 @@ func (repo *SysUserRepository) Create(ctx context.Context, obj domain.SysUser, p
 
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
 	daoSysUser, err := repo.dao.FindByAccount(ctx, account)
-	domainSysUser := repo.toDomain(daoSysUser)
+	domainSysUser := repo.toDomain(ctx, daoSysUser)
 	return domainSysUser, err
 }
 
 func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.SysUser, error) {
 	daoSysUser, daoSysDept, err := repo.dao.FindById(ctx, id)
-	domainSysUser := repo.toDomain(daoSysUser)
+	domainSysUser := repo.toDomain(ctx, daoSysUser)
 	domainSysDept := repo.deptRepo.toDomain(daoSysDept)
 	domainSysUser.Dept = domainSysDept
 	return domainSysUser, err
@@ -42,12 +42,12 @@ func (repo *SysUserRepository) FindById(ctx context.Context, id int64) (domain.S
 
 func (repo *SysUserRepository) QueryList(ctx context.Context, pageNum int, pageSize int) ([]domain.SysUser, int, error) {
 	daoList, total, err := repo.dao.QueryList(ctx, pageNum, pageSize)
-	return repo.toDomainList(daoList), total, err
+	return repo.toDomainList(ctx, daoList), total, err
 }
 
 func (repo *SysUserRepository) QueryById(ctx context.Context, id int64) (domain.SysUser, []int64, []domain.SysPost, []int64, []domain.SysRole, error) {
 	daoSysUser, daoSysDept, postIds, daoPosts, roleIds, daoRoles, err := repo.dao.QueryById(ctx, id)
-	domainSysUser := repo.toDomain(daoSysUser)
+	domainSysUser := repo.toDomain(ctx, daoSysUser)
 	domainSysDept := repo.deptRepo.toDomain(daoSysDept)
 	domainSysUser.Dept = domainSysDept
 	domainPosts := repo.postRepo.toDomainList(daoPosts)
@@ -90,9 +90,15 @@ func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	}
 }
 
-func (repo *SysUserRepository) toDomain(obj dao.SysUser) domain.SysUser {
+func (repo *SysUserRepository) toDomain(ctx context.Context, obj dao.SysUser) domain.SysUser {
+	dept, err := repo.deptRepo.dao.QueryByDeptId(ctx, *obj.DeptID)
+	deptVar := domain.SysDept{}
+	if err == nil {
+		deptVar = repo.deptRepo.toDomain(dept)
+	}
 	return domain.SysUser{
 		ID:            obj.ID,
+		Dept:          deptVar,
 		DeptID:        obj.DeptID,
 		UserName:      obj.UserName,
 		NickName:      obj.NickName,
@@ -115,10 +121,10 @@ func (repo *SysUserRepository) toDomain(obj dao.SysUser) domain.SysUser {
 	}
 }
 
-func (repo *SysUserRepository) toDomainList(daoList []dao.SysUser) []domain.SysUser {
+func (repo *SysUserRepository) toDomainList(ctx context.Context, daoList []dao.SysUser) []domain.SysUser {
 	domainList := []domain.SysUser{}
 	for _, daoObj := range daoList {
-		domainObj := repo.toDomain(daoObj)
+		domainObj := repo.toDomain(ctx, daoObj)
 		domainList = append(domainList, domainObj)
 	}
 	return domainList
