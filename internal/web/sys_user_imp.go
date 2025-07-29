@@ -206,6 +206,35 @@ func (h *SysUserHandler) ChangeStatus(ctx *gin.Context) {
 	})
 }
 
+func (h *SysUserHandler) ResetPwd(ctx *gin.Context) {
+	type UpdateReq struct {
+		ID       int64  `json:"userId" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	var req UpdateReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	err := h.svc.ResetPwd(ctx, req.ID, req.Password)
+
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
+}
+
 func (h *SysUserHandler) LoginJWT(ctx *gin.Context) {
 	type LoginReq struct {
 		UserName string `json:"userName" binding:"required"`

@@ -31,6 +31,8 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 		group.PUT("/system/user", h.Update)
 		// 更新用户状态
 		group.PUT("/system/user/changeStatus", h.ChangeStatus)
+		// 更改用户密码
+		group.PUT("/system/user/resetPwd", h.ResetPwd)
 		// 查询用户列表
 		group.GET("/system/user/list", h.QueryUserList)
 		// 查看通用系统用户：岗位post列表和角色role列表

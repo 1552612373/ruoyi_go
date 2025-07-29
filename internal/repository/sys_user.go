@@ -34,6 +34,10 @@ func (repo *SysUserRepository) ChangeStatus(ctx context.Context, userId int64, s
 	return repo.dao.ChangeStatus(ctx, userId, status)
 }
 
+func (repo *SysUserRepository) ResetPwd(ctx context.Context, userId int64, password string) error {
+	return repo.dao.ResetPwd(ctx, userId, password)
+}
+
 func (repo *SysUserRepository) FindByAccount(ctx context.Context, account string) (domain.SysUser, error) {
 	daoSysUser, err := repo.dao.FindByAccount(ctx, account)
 	domainSysUser := repo.toDomain(ctx, daoSysUser)

@@ -32,6 +32,10 @@ func (svc *SysUserService) ChangeStatus(ctx context.Context, userId int64, statu
 	return svc.repo.ChangeStatus(ctx, userId, status)
 }
 
+func (svc *SysUserService) ResetPwd(ctx context.Context, userId int64, password string) error {
+	return svc.repo.ResetPwd(ctx, userId, password)
+}
+
 func (svc *SysUserService) Login(ctx context.Context, account string, password string) (domain.SysUser, error) {
 	domainSysUser, err := svc.repo.FindByAccount(ctx, account)
 	if err == gorm.ErrRecordNotFound {
