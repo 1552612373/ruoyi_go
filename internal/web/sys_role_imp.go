@@ -20,7 +20,7 @@ type resRoleObj struct {
 	MenuCheckStrictly int     `json:"menuCheckStrictly"`
 	DeptCheckStrictly int     `json:"deptCheckStrictly"`
 	Flag              int     `json:"flag"`
-	Admin             int     `json:"admin"`
+	Admin             bool    `json:"admin"`
 	Remark            string  `json:"remark"`
 	Status            string  `json:"status"`
 	DelFlag           string  `json:"delFlag"`
@@ -34,6 +34,10 @@ type resRoleObj struct {
 }
 
 func ToResRoleObj(domainObj domain.SysRole) resRoleObj {
+	admin := false
+	if domainObj.RoleKey == "admin" {
+		admin = true
+	}
 	return resRoleObj{
 		RoleId:            domainObj.RoleId,
 		RoleName:          domainObj.RoleName,
@@ -43,7 +47,7 @@ func ToResRoleObj(domainObj domain.SysRole) resRoleObj {
 		MenuCheckStrictly: domainObj.MenuCheckStrictly,
 		DeptCheckStrictly: domainObj.DeptCheckStrictly,
 		// Flag:              domainObj.Flag,
-		// Admin:             domainObj.Admin,
+		Admin:   admin,
 		Remark:  domainObj.Remark,
 		Status:  domainObj.Status,
 		DelFlag: domainObj.DelFlag,

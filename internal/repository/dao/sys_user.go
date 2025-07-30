@@ -446,6 +446,11 @@ func (dao *SysUserDAO) DeleteById(ctx context.Context, id int64) error {
 	return tx.Commit().Error
 }
 
+func (dao *SysUserDAO) QueryAuthRoleListById(ctx context.Context, id int64) ([]SysRole, error) {
+	daoRoleList, _, err := dao.roleDao.QueryList(ctx, 1, 99)
+	return daoRoleList, err
+}
+
 func (dao *SysUserDAO) GetRoutersById(ctx context.Context, userId int64) ([]map[string]interface{}, error) {
 	var menus []SysMenu
 

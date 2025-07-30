@@ -83,3 +83,8 @@ func (svc *SysUserService) GetRoutersById(ctx context.Context, userId int64) ([]
 	}
 	return menusMap, nil
 }
+
+func (svc *SysUserService) QueryAuthRoleListById(ctx context.Context, id int64) ([]domain.SysRole, error) {
+	domainRoleList, err := svc.repo.QueryAuthRoleListById(ctx, id)
+	return domainRoleList, err
+}

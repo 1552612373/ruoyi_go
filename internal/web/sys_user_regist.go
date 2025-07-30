@@ -40,9 +40,13 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 
 		// 查询用户详情
 		group.GET("/system/user/:id", h.QueryUserDetail)
-		// 用户角色
+		// 删除用户
 		group.DELETE("/system/user/:id", h.DeleteUser)
 
+		// 认证角色列表
+		group.GET("/system/user/authRole/:id", h.QueryAuthRoleList)
+
+		// 初始密码
 		group.GET("/system/config/configKey/sys.user.initPassword", h.DefaultPassword)
 
 		// 获取首页菜单项

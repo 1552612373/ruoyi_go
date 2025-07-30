@@ -86,6 +86,12 @@ func (repo *SysUserRepository) GetRoutersById(ctx context.Context, userId int64)
 	return menusMap, nil
 }
 
+func (repo *SysUserRepository) QueryAuthRoleListById(ctx context.Context, id int64) ([]domain.SysRole, error) {
+	daoRoleList, err := repo.dao.QueryAuthRoleListById(ctx, id)
+	domainRoleList := repo.roleRepo.toDomainList(daoRoleList)
+	return domainRoleList, err
+}
+
 // 查看通用系统用户：岗位post列表和角色role列表
 func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.SysPost, []dao.SysRole, error) {
 	return repo.dao.GetSystemUserBase(ctx)

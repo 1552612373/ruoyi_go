@@ -5,6 +5,7 @@ import (
 	"go_ruoyi_base/internal/domain"
 	rescode "go_ruoyi_base/resCode"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
 
@@ -472,6 +473,52 @@ func (h *SysUserHandler) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": rescode.Success,
 		"msg":  rescode.Success.String(),
+	})
+
+}
+
+// 认证角色列表
+func (h *SysUserHandler) QueryAuthRoleList(ctx *gin.Context) {
+	// 获取路径参数 id
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  "无效的字典类型ID",
+		})
+		return
+	}
+
+	domainRoleList, errx := h.svc.QueryAuthRoleListById(ctx, id)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, errx)
+		return
+	}
+
+	domainSysUser, _, _, roleIds, _, err := h.svc.QueryById(ctx, id)
+	if err != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+	// println(roleIds)
+	resObj := toResUserObj(domainSysUser)
+
+	resList := []resRoleObj{}
+	for _, domainObj := range domainRoleList {
+		resRoleObj := ToResRoleObj(domainObj)
+		if slices.Contains(roleIds, domainObj.RoleId) {
+			// 该用户roleId包含于该角色内
+			resRoleObj.Flag = 1
+		}
+		resList = append(resList, resRoleObj)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":  rescode.Success,
+		"msg":   rescode.Success.String(),
+		"roles": resList,
+		"user":  resObj,
 	})
 
 }
