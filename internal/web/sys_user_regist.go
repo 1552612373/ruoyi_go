@@ -46,6 +46,9 @@ func (h *SysUserHandler) RegistRoutes(server *gin.Engine) {
 		// 认证角色列表
 		group.GET("/system/user/authRole/:id", h.QueryAuthRoleList)
 
+		// 只分配角色
+		group.PUT("/system/user/authRole", h.ChangeAuthRole)
+
 		// 初始密码
 		group.GET("/system/config/configKey/sys.user.initPassword", h.DefaultPassword)
 

@@ -97,6 +97,10 @@ func (repo *SysUserRepository) GetSystemUserBase(ctx context.Context) ([]dao.Sys
 	return repo.dao.GetSystemUserBase(ctx)
 }
 
+func (repo *SysUserRepository) ChangeAuthRole(ctx context.Context, userId int64, roleIds []int64) error {
+	return repo.dao.ChangeAuthRole(ctx, userId, roleIds)
+}
+
 func (repo *SysUserRepository) toDao(obj domain.SysUser) dao.SysUser {
 	return dao.SysUser{
 		ID:            obj.ID,

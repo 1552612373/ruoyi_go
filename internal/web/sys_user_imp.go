@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -521,4 +522,49 @@ func (h *SysUserHandler) QueryAuthRoleList(ctx *gin.Context) {
 		"user":  resObj,
 	})
 
+}
+
+// 只分配角色
+func (h *SysUserHandler) ChangeAuthRole(ctx *gin.Context) {
+
+	type authRole struct {
+		UserId  string `json:"userId" form:"userId"`
+		RoleIds string `json:"roleIds" form:"roleIds"`
+	}
+
+	var req authRole
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+		return
+	}
+
+	userId, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": rescode.ErrInvalidParam,
+			"msg":  rescode.ErrInvalidParam.String(),
+		})
+	}
+
+	var roleIds []int64
+	for _, s := range strings.Split(req.RoleIds, ",") {
+		if n, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64); err == nil {
+			roleIds = append(roleIds, n)
+		}
+	}
+
+	errx := h.svc.ChangeAuthRole(ctx, userId, roleIds)
+	if errx != nil {
+		utility.ThrowSysErrowIfneeded(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": rescode.Success,
+		"msg":  rescode.Success.String(),
+	})
 }

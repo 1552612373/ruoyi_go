@@ -88,3 +88,7 @@ func (svc *SysUserService) QueryAuthRoleListById(ctx context.Context, id int64) 
 	domainRoleList, err := svc.repo.QueryAuthRoleListById(ctx, id)
 	return domainRoleList, err
 }
+
+func (svc *SysUserService) ChangeAuthRole(ctx context.Context, userId int64, roleIds []int64) error {
+	return svc.repo.ChangeAuthRole(ctx, userId, roleIds)
+}

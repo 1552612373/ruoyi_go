@@ -175,7 +175,7 @@ func (dao *SysUserDAO) Update(ctx context.Context, obj SysUser, postIds []int64,
 	// 检查 ID 是否有效
 	if obj.ID == 0 {
 		tx.Rollback()
-		return errors.New("用户ID不能为空")
+		return errors.New("ZT用户ID不能为空")
 	}
 
 	userUpdates := map[string]interface{}{
@@ -243,7 +243,7 @@ func (dao *SysUserDAO) ChangeStatus(ctx context.Context, userId int64, status st
 
 	// 检查 ID 是否有效
 	if userId == 0 {
-		return errors.New("用户ID不能为空")
+		return errors.New("ZT用户ID不能为空")
 	}
 
 	userUpdates := map[string]interface{}{
@@ -261,7 +261,7 @@ func (dao *SysUserDAO) ResetPwd(ctx context.Context, userId int64, password stri
 
 	// 检查 ID 是否有效
 	if userId == 0 {
-		return errors.New("用户ID不能为空")
+		return errors.New("ZT用户ID不能为空")
 	}
 
 	userUpdates := map[string]interface{}{
@@ -449,6 +449,48 @@ func (dao *SysUserDAO) DeleteById(ctx context.Context, id int64) error {
 func (dao *SysUserDAO) QueryAuthRoleListById(ctx context.Context, id int64) ([]SysRole, error) {
 	daoRoleList, _, err := dao.roleDao.QueryList(ctx, 1, 99)
 	return daoRoleList, err
+}
+
+func (dao *SysUserDAO) ChangeAuthRole(ctx context.Context, userId int64, roleIds []int64) error {
+	// 检查 ID 是否有效
+	if userId == 0 {
+		return errors.New("ZT用户ID不能为空")
+	}
+
+	if len(roleIds) == 0 {
+		return errors.New("ZT角色ID不能为空")
+	}
+
+	// 使用事务保证数据一致性
+	return dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. 删除该用户现有的所有角色
+		if err := tx.Where("user_id = ?", userId).Delete(&SysUserRole{}).Error; err != nil {
+			return errors.New("ZT删除用户旧角色失败")
+		}
+
+		// 2. 构造要插入的新角色记录
+		var userRoles []SysUserRole
+		for _, roleId := range roleIds {
+			if roleId == 0 {
+				continue // 可选：跳过无效 roleId，或返回错误
+			}
+			userRoles = append(userRoles, SysUserRole{
+				UserId: userId,
+				RoleId: roleId,
+			})
+		}
+
+		if len(userRoles) == 0 {
+			return errors.New("ZT没有有效的角色可以分配")
+		}
+
+		// 3. 批量插入新的用户-角色关系
+		if err := tx.Create(&userRoles).Error; err != nil {
+			return fmt.Errorf("ZT插入新角色失败: %w", err)
+		}
+
+		return nil
+	})
 }
 
 func (dao *SysUserDAO) GetRoutersById(ctx context.Context, userId int64) ([]map[string]interface{}, error) {
