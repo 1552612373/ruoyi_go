@@ -1,7 +1,7 @@
 
 # RuoYi-Go —— 基于 Golang 的若依后台管理系统
 
-> 🚀 一个基于 Golang 实现的若依（RuoYi）后台管理系统框架，风格对标 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue)，致力于提供简洁高效的权限管理与企业级后台解决方案。
+> 🚀 一个基于 Golang 实现的若依（RuoYi）后台管理系统框架，风格对标基于java的 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue)，致力于提供简洁高效的权限管理与企业级后台解决方案。
 
 ---
 
@@ -40,13 +40,15 @@
 - MySQL 5.7+
 - Git
 
-### 2. 克隆项目
+### 2. 运行项目
 
-```bash
-git clone https://your-repo-url/ruoyi-go.git
-cd ruoyi-go
-```
+- 运行服务端，直接可用。
 
-所有接口路径统一加了前缀 `/api`，例如：`/api/login`、`/api/user/list`
+- 下载前端代码并运行		【参考：基于vue3+elementplus的若依前端 [https://gitcode.com/yangzongzhuan/RuoYi-Vue3]()】
 
-若使用`Vue`前端，请在 `vite.config.js` 中配置代理
+
+***注意前后端的路径和端口配置等保持统一。***
+
+后端所有接口路径统一加了前缀 `/api`，例如：`/api/login`、`/api/user/list`
+
+若使用`Vue`前端，请在 `vite.config.js` 中配置代理，或直接改go项目中的`BASE_API_PRE`
